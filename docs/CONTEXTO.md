@@ -106,3 +106,8 @@ Herramienta web (un único HTML) para **simular cómo se verá una publicación 
 - Plantillas guardadas por cliente.
 - Duplicar un proyecto para otra publicación.
 - Portada con foto de equipo.
+- **v0.7 — editor móvil (fase 2 del brief de ampliación).** La vista previa se encoge a una tira fija
+  al bajar por los campos (y con el teclado abierto); tocarla abre la vista completa, deslizar cambia
+  de slide y mantener pulsado abre las acciones de la slide. Hojas inferiores para acciones y para
+  exportar, con «Compartir» nativo (Web Share con archivos; si no hay, descarga ZIP/PNG). El botón
+  «atrás» del móvil cierra la capa abierta. Ajuste nuevo «Vista previa flotante» en Configuración.

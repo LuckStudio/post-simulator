@@ -23,6 +23,20 @@ export const UI_SETTINGS = {
       system: 'Sigue el modo claro u oscuro de tu dispositivo.',
     },
   },
+  mobilePreview: {
+    label: 'Vista previa en el móvil',
+    hint: 'Solo afecta a pantallas estrechas. «Flotante» deja los campos a pantalla completa con una vista previa pequeña que se arrastra.',
+    attr: 'preview',
+    default: 'top',
+    options: {
+      top: 'Arriba',
+      floating: 'Flotante',
+    },
+    optionHints: {
+      top: 'Se ve grande arriba y se encoge a una tira al bajar por los campos.',
+      floating: 'Toca la vista previa para verla a pantalla completa.',
+    },
+  },
   density: {
     label: 'Densidad',
     hint: 'La vista compacta reduce espacios y deja más sitio a la vista previa.',

@@ -882,83 +882,249 @@ input[type='color'] {
 }
 
 /* ---------- Móvil y tablet: vista previa arriba, ajustes debajo, barra de iconos abajo ---------- */
+/* ---------- Móvil (hasta 900 px): editor propio, la vista previa siempre a la vista ----------
+ * La página no se desplaza: cabecera, vista previa, secciones en chips y un panel que se desplaza por
+ * dentro. Al bajar por los campos (o al abrir el teclado) la vista previa pasa a una tira compacta
+ * (`html[data-view='compact']`). `.main` desaparece de la maquetación (`display: contents`) para que
+ * cabecera, vista previa y controles sean celdas de la misma rejilla. */
 @media (max-width: 900px) {
+  html,
   body {
-    height: auto;
-    min-height: 100%;
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
   }
+  body {
+    -webkit-tap-highlight-color: transparent;
+  }
+  button,
+  .btn,
+  .seg button,
+  .chip {
+    touch-action: manipulation;
+  }
+
   .app {
-    display: flex;
-    flex-direction: column;
-    height: auto;
-    min-height: 100vh;
-    padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: var(--app-top, 0px);
+    height: var(--app-h, 100dvh);
+    padding-top: env(safe-area-inset-top, 0px);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto minmax(0, 1fr);
+    grid-template-areas:
+      'tool tool'
+      'view view'
+      'dock dock'
+      'rail rail'
+      'panel panel';
+    background: var(--panel);
   }
   .main {
-    order: 1;
-    background: var(--stage);
+    display: contents;
   }
-  .panel {
-    order: 2;
-    border-right: 0;
-    border-top: 1px solid var(--line);
-    border-radius: 16px 16px 0 0;
-    margin-top: -1px;
-    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
-  }
-  .panel-body {
-    overflow: visible;
-  }
-  .canvas-wrap {
-    flex: none;
-    height: 58vh;
-    min-height: 320px;
-    padding: 8px 16px;
-  }
+
+  /* Cabecera: modo estático/animado, ajustes y Exportar */
   .toolbar {
-    padding: 10px 16px;
+    grid-area: tool;
+    flex-wrap: wrap;
+    padding: 8px 12px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    gap: 8px;
   }
-  .dock {
-    padding: 4px 16px 20px;
-  }
-  .rail {
-    position: fixed;
-    inset: auto 0 0 0;
-    z-index: 30;
-    flex-direction: row;
-    gap: 0;
-    padding: 6px 2px calc(6px + env(safe-area-inset-bottom, 0px));
-    border-right: 0;
-    border-top: 1px solid var(--line);
-    overflow: visible;
-  }
-  .rail-brand {
+  #fmtTop {
     display: none;
   }
-  .rail-tabs {
+
+  /* Vista previa y controles de slide */
+  .canvas-wrap {
+    grid-area: view;
+    flex: none;
+    height: clamp(220px, calc(var(--app-h, 100dvh) * 0.38), 440px);
+    padding: 10px 16px 4px;
+    background: var(--stage);
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  #preview {
+    -webkit-touch-callout: none;
+  }
+  .dock {
+    grid-area: dock;
+    padding: 4px 12px 10px;
+    background: var(--stage);
+    gap: 2px;
+  }
+  .film {
+    display: none;
+  }
+  .dots {
+    display: flex;
+  }
+
+  /* Secciones: chips con desplazamiento horizontal (Exportar y Configuración tienen sus botones) */
+  .rail {
+    grid-area: rail;
     flex-direction: row;
-    justify-content: space-between;
+    align-items: center;
     gap: 0;
+    padding: 8px 12px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
     overflow-x: auto;
+    overflow-y: hidden;
     scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
+  .rail-brand,
+  .rail-end,
+  .rail-settings {
+    display: none !important;
+  }
+  .rail-tabs {
+    flex: none;
+    flex-direction: row;
+    width: auto;
+    gap: 8px;
   }
   .rail-btn {
-    flex: 1 1 0;
+    flex: none;
     width: auto;
-    min-width: 0;
-    padding: 6px 0;
-    font-size: 9.5px;
-    letter-spacing: -0.01em;
+    min-height: 40px;
+    flex-direction: row;
+    padding: 0 16px;
+    border: 1px solid var(--line-strong);
+    border-radius: 20px;
+    background: var(--panel);
+    color: var(--ink);
+    font-size: 14px;
+    white-space: nowrap;
   }
   .rail-btn svg {
-    width: 21px;
-    height: 21px;
+    display: none;
   }
-  .rail-end {
-    margin-top: 0;
+  .rail-btn[aria-current='page'] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--panel);
   }
-  .toast {
-    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  .rail-btn .lbl-full {
+    display: inline !important;
+  }
+  .rail-btn .lbl-short {
+    display: none !important;
+  }
+
+  /* Ajustes de la sección: ocupan el resto y se desplazan por dentro */
+  .panel {
+    grid-area: panel;
+    min-height: 0;
+    border-right: 0;
+  }
+  .panel-head {
+    display: none;
+  }
+  .panel-body {
+    padding: 4px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Campos y botones cómodos para el dedo (16 px evita el zoom automático de iOS) */
+  input[type='text'],
+  input[type='number'],
+  textarea,
+  select {
+    font-size: 16px;
+    padding: 10px 12px;
+  }
+  .btn {
+    min-height: 44px;
+  }
+  .btn.icon {
+    width: 44px;
+  }
+  .btn.sm {
+    min-height: 40px;
+  }
+  .seg button,
+  .chip {
+    min-height: 40px;
+  }
+  .toggle {
+    min-height: 44px;
+  }
+  .range input {
+    min-height: 32px;
+  }
+
+  /* Vista previa encogida: una tira fija con la miniatura a la izquierda y las flechas a la derecha */
+  :root[data-view='compact'] .app {
+    grid-template-rows: auto auto auto minmax(0, 1fr);
+    grid-template-areas:
+      'tool tool'
+      'view dock'
+      'rail rail'
+      'panel panel';
+  }
+  :root[data-view='compact'] .canvas-wrap {
+    width: 92px;
+    height: 104px;
+    padding: 8px 0 8px 12px;
+  }
+  :root[data-view='compact'] .dock {
+    align-self: stretch;
+    justify-content: center;
+    padding: 8px 12px 8px 4px;
+  }
+  :root[data-view='compact'] .dots {
+    display: none;
+  }
+  :root[data-view='compact'] .nav-row {
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  :root[data-view='compact'] .count {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    font-size: 13px;
+  }
+
+  /* Vista previa flotante (Configuración): campos a pantalla completa y una tarjeta que se arrastra */
+  :root[data-preview='floating'] .app {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-areas:
+      'tool'
+      'rail'
+      'panel';
+  }
+  :root[data-preview='floating'] .canvas-wrap {
+    position: absolute;
+    right: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    z-index: 20;
+    width: 132px;
+    height: 168px;
+    padding: 6px;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+    background: var(--stage);
+  }
+  :root[data-preview='floating'] .dock {
+    display: none;
+  }
+  :root[data-preview='floating'] .panel-body {
+    padding-bottom: calc(200px + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -970,16 +1136,19 @@ input[type='color'] {
 :root[data-density='compact'] body {
   font-size: 14px;
 }
-:root[data-density='compact'] .rail-btn {
-  width: 66px;
-  padding: 6px 0;
-  font-size: 10.5px;
-}
-:root[data-density='compact'] .lbl-full {
-  display: none;
-}
-:root[data-density='compact'] .lbl-short {
-  display: inline;
+/* La barra de iconos más estrecha solo existe en el escritorio (en el móvil son chips). */
+@media (min-width: 901px) {
+  :root[data-density='compact'] .rail-btn {
+    width: 66px;
+    padding: 6px 0;
+    font-size: 10.5px;
+  }
+  :root[data-density='compact'] .lbl-full {
+    display: none;
+  }
+  :root[data-density='compact'] .lbl-short {
+    display: inline;
+  }
 }
 :root[data-density='compact'] .panel-head {
   padding: 14px 16px 2px;
@@ -1036,6 +1205,311 @@ input[type='color'] {
   .rail-settings {
     display: none !important;
   }
+}
+
+/* ---------- Puntos de paginación ---------- */
+.dots {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.dot {
+  width: 22px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.dot::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 4px;
+  background: var(--line-strong);
+  transition: width 0.15s;
+}
+.dot[aria-current='true']::before {
+  width: 20px;
+  background: var(--accent);
+}
+
+/* ---------- Vista completa (móvil) ---------- */
+.fullview {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  padding-top: env(safe-area-inset-top, 0px);
+  background: #111315;
+  color: #f2f4f6;
+}
+.fullbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+}
+.fullbar strong {
+  flex: 1;
+  text-align: center;
+  font-size: 15px;
+}
+.full-stage {
+  flex: 1;
+  min-height: 0;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.full-stage #preview {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+.fullfoot {
+  flex: none;
+  padding: 10px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.fullfoot .dot::before {
+  background: #6a7078;
+}
+.fullfoot .dot[aria-current='true']::before {
+  background: #f2f4f6;
+}
+.fullhint {
+  margin: 0;
+  font-size: 12px;
+  color: #b4bac1;
+  text-align: center;
+}
+.fullrow {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+.fullrow .btn {
+  flex: 1;
+  min-height: 48px;
+}
+.btn.dark {
+  border-color: #6a7078;
+  color: #f2f4f6;
+  background: none;
+}
+.btn.dark:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.btn.icon.dark {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: transparent;
+}
+.fullview .btn.primary {
+  background: #71b7fb;
+  color: #0b1a2b;
+  border-color: #71b7fb;
+}
+
+/* ---------- Hojas inferiores ---------- */
+.sheet-root {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 18, 21, 0.45);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.sheet {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(var(--app-h, 100dvh) - 24px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--panel);
+  color: var(--ink);
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.22);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  transform: translateY(100%);
+  transition: transform 0.22s ease;
+  outline: none;
+}
+.sheet-root.open .sheet-backdrop {
+  opacity: 1;
+}
+.sheet-root.open .sheet {
+  transform: none;
+}
+.sheet-handle {
+  flex: none;
+  align-self: center;
+  width: 40px;
+  height: 5px;
+  margin: 8px 0 4px;
+  border-radius: 3px;
+  background: var(--line-strong);
+}
+.sheet-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 12px 8px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.sheet-head h2 {
+  flex: 1;
+  margin: 0;
+  font-size: 18px;
+}
+.sheet-body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 8px 0 16px;
+}
+
+/* El menú de acciones dentro de una hoja: sin caja y con filas grandes */
+.menu.in-sheet {
+  position: static;
+  min-width: 0;
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  background: none;
+  overflow: visible;
+}
+.in-sheet .menu-item {
+  min-height: 54px;
+  padding: 6px 20px;
+  border-radius: 0;
+  font-size: 16px;
+}
+.in-sheet .menu-sep {
+  margin: 4px 20px;
+}
+.menu-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.menu-desc {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---------- Hoja de exportar ---------- */
+.xs {
+  padding: 4px 20px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.xs-thumbs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px;
+}
+.xs-thumb {
+  flex: none;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+.xs-meta {
+  margin: -8px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.xs-share {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 64px;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.xs-share-text {
+  display: flex;
+  flex-direction: column;
+}
+.xs-share-text strong {
+  font-size: 16px;
+}
+.xs-share-text span {
+  font-size: 13px;
+  opacity: 0.9;
+}
+.xs-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.xs-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-height: 96px;
+  padding: 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.xs-card svg {
+  color: var(--accent);
+}
+.xs-card span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.xs-card:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.xs-more {
+  align-self: flex-start;
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 /* Etiqueta corta de la barra de iconos en pantallas muy estrechas */

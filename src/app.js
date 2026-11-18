@@ -25,9 +25,11 @@ import {
 import { createAssets } from './render/assets.js';
 import { fontFn } from './render/context.js';
 import { copySlideImage, exportAllPngZip, exportSlidePng } from './export/images.js';
+import { shareSlides } from './export/share.js';
+import { renderSlideToCanvas } from './render/carousel.js';
 import { exportProjectJson, exportViewerHtml } from './export/project.js';
 import { exportVideo } from './export/video.js';
-import { saveFile } from './io/files.js';
+import { canvasToBlob, projectBaseName, saveFile, slideFileName } from './io/files.js';
 import { detectInstalledFonts } from './io/fonts.js';
 import { parseProjectFile } from './io/project.js';
 import { createInstallPrompt, requestPersistence, storageStatus } from './pwa.js';
@@ -37,6 +39,8 @@ import { $, h } from './ui/dom.js';
 import { createRecorderDialog, toast } from './ui/feedback.js';
 import { createFields } from './ui/fields.js';
 import { mountStaticIcons } from './ui/icons.js';
+import { createExportSheet } from './ui/exportSheet.js';
+import { createMobileShell } from './ui/mobile.js';
 import { createPanelHost } from './ui/panels/index.js';
 import { createPreview } from './ui/preview.js';
 import { buildSlideMenu } from './ui/slideMenu.js';
@@ -236,10 +240,12 @@ export function startApp() {
     get: () => prefs.get().ui,
     set(key, value) {
       applyUiSettings(prefs.setUi({ [key]: value }));
+      mobile.refresh();
       panels.render();
     },
     reset() {
       applyUiSettings(prefs.resetUi());
+      mobile.refresh();
       panels.render();
       toast('Configuración de la herramienta restablecida.');
     },
@@ -255,6 +261,32 @@ export function startApp() {
     exportPngAll: () => withStaticPreview(({ rc, slides }) => exportAllPngZip({ rc, slides, notify: toast })),
     exportHtml: () => withStaticPreview(({ rc, slides }) => exportViewerHtml({ rc, slides, notify: toast })),
     exportJson: () => exportProjectJson({ state: store.state, notify: toast }),
+
+    /** Compartir con la hoja nativa del sistema; si el navegador no puede, se descargan los archivos. */
+    share: {
+      async slides(list) {
+        try {
+          preview.syncVideoStatic();
+          const { rc } = preview.carousel;
+          const base = projectBaseName(store.state);
+          const result = await shareSlides({
+            slides: list,
+            renderBlob: (s) => canvasToBlob(renderSlideToCanvas(rc, s)),
+            fileName: (s) => `${base}-${slideFileName(s)}.png`,
+            title: store.state.author.name,
+          });
+          if (result.status === 'unsupported') {
+            toast('Este navegador no permite compartir archivos: se descargan las imágenes.');
+            if (list.length > 1) await exportAllPngZip({ rc, slides: list, notify: toast });
+            else await exportSlidePng({ rc, slide: list[0], notify: toast });
+          } else if (result.status === 'error') toast('No se pudo compartir. Prueba a descargar las imágenes.', true);
+        } catch {
+          toast('No se pudo preparar el archivo para compartir.', true);
+        }
+      },
+      all: () => actions.share.slides(preview.carousel.slides),
+      one: (index) => actions.share.slides([preview.carousel.slides[index]]),
+    },
 
     async copySlideImage(index) {
       try {
@@ -410,6 +442,10 @@ export function startApp() {
   const fields = createFields({ store, rerender: () => panels.render() });
   const panels = createPanelHost({ store, assets, actions, preview, prefs, f: fields });
 
+  // Móvil: hoja de exportar, vista completa, gestos y vista previa que se encoge.
+  const exportSheet = createExportSheet({ store, preview, actions, panels });
+  const mobile = createMobileShell({ preview, panels, openSlideMenu, openExport: () => exportSheet.open() });
+
   // ---------- Suscripciones y arranque ----------
 
   store.subscribe((_, reason) => {
@@ -432,8 +468,9 @@ export function startApp() {
     .matchMedia?.('(prefers-color-scheme: dark)')
     .addEventListener?.('change', () => applyUiSettings(prefs.get().ui));
   mountStaticIcons();
-  $('#exportGo').onclick = () => panels.select('export', { reveal: true });
-  $('#settingsGo').onclick = () => panels.select('settings', { reveal: true });
+  // En el móvil «Exportar» abre la hoja inferior; en el escritorio, la pestaña Exportar.
+  $('#exportGo').onclick = () => (mobile.isNarrow() ? exportSheet.open() : panels.select('export'));
+  $('#settingsGo').onclick = () => panels.select('settings');
   $('#slideMenuBtn').onclick = (e) => {
     const btn = e.currentTarget;
     openSlideMenu(

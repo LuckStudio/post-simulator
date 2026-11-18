@@ -2,7 +2,10 @@
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content"
+    />
     <title>Post Simulator · Simula cómo se verá tu publicación</title>
     <meta name="theme-color" content="#0a66c2" />
     <meta
@@ -56,6 +59,7 @@
         if (ui.appearance === 'light' || ui.appearance === 'dark')
           document.documentElement.dataset.theme = ui.appearance;
         if (ui.density === 'compact') document.documentElement.dataset.density = 'compact';
+        if (ui.mobilePreview === 'floating') document.documentElement.dataset.preview = 'floating';
       } catch (e) {}
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -161,9 +165,42 @@
               data-icon-size="20"
             ></button>
           </div>
+          <div class="dots" id="dots" role="group" aria-label="Slides"></div>
           <div class="film" id="film" aria-label="Slides del carrusel"></div>
         </div>
       </main>
+    </div>
+
+    <!-- Vista completa (solo móvil): la misma vista previa a pantalla completa -->
+    <div class="fullview" id="fullview" role="dialog" aria-modal="true" aria-label="Vista completa" hidden>
+      <header class="fullbar">
+        <button
+          class="btn icon dark"
+          id="fullClose"
+          type="button"
+          aria-label="Cerrar la vista completa"
+          data-icon="close"
+          data-icon-size="20"
+        ></button>
+        <strong id="fullTitle" aria-live="polite"></strong>
+        <button
+          class="btn icon dark"
+          id="fullPlay"
+          type="button"
+          aria-label="Reproducir la animación"
+          data-icon="play"
+          data-icon-size="18"
+        ></button>
+      </header>
+      <div class="full-stage" id="fullStage"></div>
+      <footer class="fullfoot">
+        <div class="dots" role="group" aria-label="Slides"></div>
+        <p class="fullhint">Desliza para cambiar de slide · mantén pulsado para más opciones</p>
+        <div class="fullrow">
+          <button class="btn dark" id="fullEdit" type="button">Editar esta slide</button>
+          <button class="btn primary" id="fullExport" type="button">Exportar</button>
+        </div>
+      </footer>
     </div>
 
     <div class="toast" id="toast" role="status"></div>

@@ -84,7 +84,7 @@ Un carrusel de ejemplo (portada, publicación con imagen y cierre) en formato 4:
     </td>
     <td width="50%" valign="top" align="center">
       <h3>📱 También en el móvil</h3>
-      <p align="left">Se instala como una app y funciona sin conexión. Tus proyectos y presets se quedan en tu dispositivo.</p>
+      <p align="left">Se instala como una app y funciona sin conexión. La vista previa se encoge y se queda fija al bajar por los campos; tócala para verla a pantalla completa, desliza para cambiar de slide, mantén pulsado para las acciones y comparte directo a Instagram o WhatsApp desde «Exportar».</p>
       <img src="docs/img/movil.png" alt="La herramienta en un móvil, con la barra de secciones abajo" width="260">
     </td>
   </tr>

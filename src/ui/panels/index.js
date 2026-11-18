@@ -27,10 +27,6 @@ const SECTIONS = [
  * al engranaje de la barra superior en pantallas estrechas. */
 const RAIL_CLASS = { export: 'rail-end', settings: 'rail-settings' };
 
-/** En pantallas estrechas el panel queda debajo de la vista previa. */
-const isNarrow = () => window.matchMedia('(max-width: 900px)').matches;
-const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
 /**
  * Barra lateral de iconos + panel de ajustes de la sección activa. `deps` se pasa a
  * cada sección junto con `rerender`, para que puedan repintarse cuando cambian
@@ -43,6 +39,10 @@ export function createPanelHost(deps) {
   const title = $('#panelTitle');
 
   function renderTabs() {
+    // En móvil las secciones son chips con desplazamiento horizontal: se conserva al repintar
+    // y se deja a la vista el chip activo.
+    const rail = nav.closest('.rail');
+    const keep = rail ? rail.scrollLeft : 0;
     nav.replaceChildren(
       ...SECTIONS.map(([id, label, icon, , short]) =>
         h(
@@ -51,7 +51,7 @@ export function createPanelHost(deps) {
             type: 'button',
             class: RAIL_CLASS[id] ? `rail-btn ${RAIL_CLASS[id]}` : 'rail-btn',
             'aria-current': id === active ? 'page' : 'false',
-            onclick: () => select(id, { reveal: true }),
+            onclick: () => select(id),
           },
           svgIcon(icon),
           // En pantallas muy estrechas la etiqueta larga se sustituye por la corta (ver CSS).
@@ -61,6 +61,10 @@ export function createPanelHost(deps) {
         ),
       ),
     );
+    if (rail) {
+      rail.scrollLeft = keep;
+      nav.querySelector('[aria-current="page"]')?.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+    }
   }
 
   function render() {
@@ -72,15 +76,12 @@ export function createPanelHost(deps) {
     body.scrollTop = scroll;
   }
 
-  /** Cambia de sección. `reveal` lleva la vista hasta el panel cuando está debajo de la vista previa. */
-  function select(id, { reveal = false } = {}) {
+  /** Cambia de sección y vuelve al principio de sus ajustes. */
+  function select(id) {
     active = id;
     renderTabs();
     render();
     body.scrollTop = 0;
-    if (reveal && isNarrow()) {
-      $('.panel').scrollIntoView({ block: 'start', behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
-    }
   }
 
   return {

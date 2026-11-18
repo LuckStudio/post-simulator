@@ -3,6 +3,11 @@
  * Todo lo que hace pasa por el store o las acciones de la app; aquí solo se decide qué ofrecer.
  */
 
+import { canShareImages } from '../export/share.js';
+
+/** Sección del panel donde se edita una slide según su tipo. */
+export const editPanelFor = (slide) => (slide?.type === 'cover' ? 'cover' : slide?.type === 'cta' ? 'cta' : 'post');
+
 const FIT_LABELS = {
   auto: 'Texto: ajustar el tamaño automáticamente',
   split: 'Texto: dividir en varias slides',
@@ -110,11 +115,39 @@ export function buildSlideMenu({ target, store, panels, preview, actions, toast 
     });
   }
 
+  // Portada y cierre ocultos: se pueden volver a añadir desde cualquier slide (en el móvil no hay
+  // tira de miniaturas con huecos).
+  const addBack = [
+    !state.cover.on && {
+      label: 'Añadir portada',
+      icon: 'plus',
+      onSelect: change('cover.on', true),
+    },
+    !state.cta.on && {
+      label: 'Añadir cierre',
+      icon: 'plus',
+      onSelect: change('cta.on', true),
+    },
+  ].filter(Boolean);
+  if (addBack.length) items.push(SEP, ...addBack);
+
+  const shareItems = canShareImages()
+    ? [
+        {
+          label: 'Compartir imagen',
+          desc: 'Instagram, WhatsApp, Fotos…',
+          icon: 'share',
+          onSelect: () => actions.share.one(i),
+        },
+      ]
+    : [];
+
   items.push(
     SEP,
     edit('Ajustes de animación', 'anim', 'anim'),
     { label: 'Reproducir animación', icon: 'play', onSelect: () => preview.playSlide(i) },
     SEP,
+    ...shareItems,
     {
       label: 'Descargar imagen (PNG)',
       icon: 'export',

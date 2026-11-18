@@ -20,7 +20,8 @@ const THUMB_HEIGHT = 96;
 export function createPreview({ store, assets, onSlideMenu = () => {}, onGhost = () => {} }) {
   const canvas = $('#preview');
   const pctx = canvas.getContext('2d');
-  const wrap = $('#cwrap');
+  /** Contenedor donde se ajusta el lienzo: la zona de vista previa o, en el móvil, la vista completa. */
+  let wrap = $('#cwrap');
   const film = $('#film');
   const thumbBuf = document.createElement('canvas');
 
@@ -65,8 +66,11 @@ export function createPreview({ store, assets, onSlideMenu = () => {}, onGhost =
       canvas.width = W;
       canvas.height = H;
     }
-    const aw = wrap.clientWidth - 36;
-    const ah = wrap.clientHeight - 16;
+    // El espacio útil es el del contenedor menos su relleno, para que sirva en cualquier sitio.
+    const cs = getComputedStyle(wrap);
+    const pad = (a, b) => (parseFloat(cs[a]) || 0) + (parseFloat(cs[b]) || 0);
+    const aw = wrap.clientWidth - pad('paddingLeft', 'paddingRight');
+    const ah = wrap.clientHeight - pad('paddingTop', 'paddingBottom');
     const sc = Math.max(0.05, Math.min(aw / W, ah / H));
     canvas.style.width = Math.floor(W * sc) + 'px';
     canvas.style.height = Math.floor(H * sc) + 'px';
@@ -77,10 +81,33 @@ export function createPreview({ store, assets, onSlideMenu = () => {}, onGhost =
   function updateNav() {
     const n = carousel.slides.length;
     const sl = carousel.slides[view.cur];
-    $('#count').textContent = n ? `${sl.label} · ${view.cur + 1} de ${n}` : '—';
+    const text = n ? `${sl.label} · ${view.cur + 1} de ${n}` : '—';
+    $('#count').textContent = text;
+    const fullTitle = $('#fullTitle');
+    if (fullTitle) fullTitle.textContent = text;
+    renderDots(n);
     $('#prevBtn').disabled = view.cur <= 0;
     $('#nextBtn').disabled = view.cur >= n - 1;
     $$('#film button:not(.ghost)').forEach((b, i) => b.setAttribute('aria-current', i === view.cur ? 'true' : 'false'));
+  }
+
+  /** Puntos de paginación (uno por slide) en todos los contenedores `.dots`. */
+  function renderDots(n) {
+    $$('.dots').forEach((box) => {
+      if (box.children.length !== n) {
+        box.replaceChildren(
+          ...Array.from({ length: n }, (_, i) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'dot';
+            b.setAttribute('aria-label', `Ir a la slide ${i + 1}`);
+            b.onclick = () => go(i);
+            return b;
+          }),
+        );
+      }
+      [...box.children].forEach((d, i) => d.setAttribute('aria-current', i === view.cur ? 'true' : 'false'));
+    });
   }
 
   function go(i) {
@@ -274,8 +301,14 @@ export function createPreview({ store, assets, onSlideMenu = () => {}, onGhost =
 
   // ---------- Eventos ----------
 
-  new ResizeObserver(() => fitCanvas()).observe(wrap);
-  canvas.addEventListener('contextmenu', (e) => menuAt(e, canvas, { kind: 'slide', index: view.cur }));
+  const resizeObserver = new ResizeObserver(() => fitCanvas());
+  resizeObserver.observe(wrap);
+  canvas.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    // En pantallas táctiles el menú se abre con la pulsación larga (ver ui/mobile.js).
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+    menuAt(e, canvas, { kind: 'slide', index: view.cur });
+  });
   $('#prevBtn').onclick = () => go(view.cur - 1);
   $('#nextBtn').onclick = () => go(view.cur + 1);
   document.addEventListener('keydown', (e) => {
@@ -299,6 +332,22 @@ export function createPreview({ store, assets, onSlideMenu = () => {}, onGhost =
     },
     get mode() {
       return view.mode;
+    },
+    /** Cambia el contenedor donde se muestra el lienzo (p. ej. a la vista completa del móvil). */
+    setHost(el) {
+      resizeObserver.unobserve(wrap);
+      wrap = el;
+      el.append(canvas);
+      resizeObserver.observe(el);
+      fitCanvas();
+    },
+    /** Reconstruye y dibuja ya, sin esperar al siguiente fotograma. */
+    flush() {
+      rebuild();
+      fitCanvas();
+      updateNav();
+      renderStatic();
+      scheduleThumbs();
     },
     go,
     playSlide,

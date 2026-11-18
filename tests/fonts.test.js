@@ -61,7 +61,7 @@ describe('prefs', () => {
     expect(createPrefs(st).get()).toEqual({
       fontsRecent: [],
       fontsInstalled: [],
-      ui: { appearance: 'system', density: 'comfortable' },
+      ui: { appearance: 'system', mobilePreview: 'top', density: 'comfortable' },
     });
   });
 });

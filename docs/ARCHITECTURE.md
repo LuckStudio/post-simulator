@@ -118,6 +118,16 @@ opción por defecto no pone atributo. Se guardan en las preferencias del navegad
 script en línea de `src/index.html` los aplica antes de pintar para evitar parpadeos. **Para añadir una
 forma nueva de ver la herramienta**: una entrada en `UI_SETTINGS` y su CSS; la pestaña la muestra sola.
 
+## Móvil (`ui/mobile.js` y piezas asociadas)
+
+Misma interfaz y mismos paneles que el escritorio; en pantallas de hasta 900 px solo cambia la
+colocación (CSS en rejilla con `.main{display:contents}`) y el tacto. Piezas: `gestures.js`
+(toque, deslizamiento, pulsación larga y arrastre; `classifyRelease` es pura y está probada),
+`overlays.js` (pila de capas integrada con el historial para que «atrás» cierre la de arriba),
+`sheet.js` (hoja inferior), `exportSheet.js` y `export/share.js` (Web Share con archivos).
+`mobile.js` ajusta `data-view` (`expanded`/`compact`), `data-keyboard` y `--app-h` según el
+`visualViewport`. El lienzo se reubica en la vista completa con `preview.setHost`.
+
 ## Cómo añadir…
 
 - **Un campo nuevo al proyecto**: añádelo a `DEFAULT_STATE` (`state/defaults.js`). Los
