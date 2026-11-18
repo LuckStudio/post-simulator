@@ -60,11 +60,26 @@ Herramienta web (un único HTML) para crear **carruseles de Instagram con estét
   no cambia (sigue idéntico al original). Se corrigió la publicación: GitHub Pages servía
   el HTML de desarrollo y ahora sirve la build de la raíz.
 
+- **v0.4 — estándares, presets y PWA.**
+  - Estándar nuevo: avatar en círculo; texto con ajuste automático; contador de reacciones visible con
+    Recomendación, Idea y Corazón; fondo en degradado #f2f2f2 → #ebedf0; sombra de 50 px (ajustable);
+    animación «uno tras otro» con curva «rápida al inicio» (preset _Estándar_). Los proyectos ya guardados
+    se migran sin perder lo que el usuario cambió.
+  - Duración configurable de las slides, y de la que lleva vídeo (completo, personalizada o como las demás).
+  - Clic derecho en la tira de slides (y en la slide): editar, ocultar/mostrar portada y cierre, modo de texto,
+    reacciones, reproducir, descargar PNG/vídeo, copiar imagen. Hueco punteado para recuperar lo oculto.
+  - Tipografías: estándar, recientes y todas las instaladas (o escribir el nombre).
+  - Presets en localStorage con importar/exportar; PWA instalable y sin conexión; almacenamiento persistente.
+
 ## Limitaciones conocidas
 
 - El vídeo subido dentro del post no se guarda en JSON ni en HTML; hay que resubirlo al importar.
 - La importación de PDF no se pudo probar en el entorno de desarrollo. Alternativa: subir las páginas como imágenes.
 - No hay exportación a GIF.
+- Listar _todas_ las fuentes instaladas solo funciona en Chrome/Edge (pide permiso); en otros navegadores
+  se detectan las habituales y se puede escribir el nombre de cualquier otra.
+- Las fuentes del dispositivo se ven y exportan en este equipo; en otro se sustituyen por la del sistema.
+- Un preset con imágenes grandes (avatar, fondo) puede no caber en localStorage (~5 MB): se avisa.
 
 ## Próximos pasos propuestos
 

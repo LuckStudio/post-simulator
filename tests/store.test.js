@@ -53,14 +53,14 @@ describe('createStore', () => {
     store.subscribe(fn);
     store.replace({ format: '1:1' });
     expect(store.state.format).toBe('1:1');
-    expect(store.state.post.fit).toBe('split');
+    expect(store.state.post.fit).toBe(DEFAULT_STATE.post.fit);
     expect(fn.mock.calls[0][1]).toBe('replace');
   });
   it('reset no comparte referencias con los valores por defecto', () => {
     const store = createStore();
     store.reset();
-    store.state.stats.types.push('idea');
-    expect(DEFAULT_STATE.stats.types).not.toContain('idea');
+    store.state.stats.types.push('star');
+    expect(DEFAULT_STATE.stats.types).not.toContain('star');
   });
   it('subscribe devuelve una función para darse de baja', () => {
     const store = createStore();

@@ -37,17 +37,18 @@ miniaturas, y en el futuro plantillas por cliente o duplicar carruseles).
 
 ## Carpetas
 
-| Carpeta             | Responsabilidad                                                                           | ¿Toca el DOM? |
-| ------------------- | ----------------------------------------------------------------------------------------- | ------------- |
-| `src/core`          | Constantes (formatos, temas, fuentes, reacciones), utilidades, color.                     | No            |
-| `src/state`         | Esquema y valores por defecto, store con suscripciones, persistencia.                     | No*           |
-| `src/animation`     | Curvas, catálogo de animaciones y presets, cálculo de la línea de tiempo.                 | No            |
-| `src/render`        | Contexto de render, maquetado de texto, geometría, slides y dibujo en canvas.             | Solo canvas   |
-| `src/render/slides` | Un módulo por tipo de slide: `cover`, `post`, `cta`.                                      | Solo canvas   |
-| `src/io`            | Archivos: descargas, lectura de imágenes, PDF (pdf.js bajo demanda), formato de proyecto. | Sí            |
-| `src/export`        | PNG/ZIP, vídeo (MediaRecorder), HTML visor y JSON.                                        | Sí            |
-| `src/ui`            | Helpers de DOM, campos de formulario, vista previa, avisos y una pestaña por archivo.     | Sí            |
-| `src/app.js`        | Composición: crea store, recursos, vista previa y panel; define las acciones.             | Sí            |
+| Carpeta                     | Responsabilidad                                                                                                                                                                  | ¿Toca el DOM? |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| `src/core`                  | Constantes (formatos, temas, fuentes, reacciones), utilidades, color.                                                                                                            | No            |
+| `src/state`                 | Esquema y valores estándar, store con suscripciones, migración de versiones, persistencia, presets (biblioteca en localStorage, importar/exportar) y preferencias del navegador. | No*           |
+| `src/animation`             | Curvas, catálogo de animaciones y presets, cálculo de la línea de tiempo.                                                                                                        | No            |
+| `src/render`                | Contexto de render, maquetado de texto, geometría, slides y dibujo en canvas.                                                                                                    | Solo canvas   |
+| `src/render/slides`         | Un módulo por tipo de slide: `cover`, `post`, `cta`.                                                                                                                             | Solo canvas   |
+| `src/io`                    | Archivos: descargas, lectura de imágenes, PDF (pdf.js bajo demanda), formato de proyecto.                                                                                        | Sí            |
+| `src/export`                | PNG/ZIP, vídeo (MediaRecorder), HTML visor y JSON.                                                                                                                               | Sí            |
+| `src/ui`                    | Helpers de DOM, campos de formulario, vista previa, avisos y una pestaña por archivo.                                                                                            | Sí            |
+| `src/pwa.js`, `src/public/` | Service worker (sin conexión), manifiesto, iconos, instalación y almacenamiento persistente.                                                                                     | Sí            |
+| `src/app.js`                | Composición: crea store, recursos, vista previa y panel; define las acciones.                                                                                                    | Sí            |
 
 \* `persistence.js` usa `localStorage`, que se le puede inyectar.
 
@@ -94,6 +95,19 @@ en el segundo `t`, o estáticos si `t` es `null`) y el pie.
 orden (cascada o secuencial), la separación y el tipo. `render/effects.js` aplica las
 transformaciones de caja (fundido, desplazamiento, escala, recorte, desenfoque…) y
 `render/text.js` las animaciones de texto (máquina de escribir, palabra a palabra, línea a línea).
+
+## Presets, migración y datos locales
+
+- **Proyecto** (`carrusel-ofertas-v1`), **presets** (`carrusel-ofertas-presets-v1`) y **preferencias**
+  (`…-prefs-v1`: tipografías recientes e instaladas) viven en `localStorage`; nada va a un servidor.
+- Un **preset** guarda un fragmento del estado por secciones (`PRESET_SECTIONS`) y se aplica con
+  `applyPreset`, que mezcla solo esas secciones y conserva el resto. Todo lo que se importa pasa por
+  `sanitizePreset` (secciones y claves permitidas) y `deepMerge` ignora `__proto__`, `constructor` y `prototype`.
+- `hydrate` = `migrate` + mezcla con `DEFAULT_STATE`. `migrate` lleva proyectos viejos a los nuevos
+  estándar sin pisar lo que el usuario cambió a mano.
+- La duración de cada slide la decide `resolveSlideDuration` (`animation/timeline.js`): automática, fija o,
+  en la slide con vídeo, vídeo completo / personalizada.
+- Menú contextual: `ui/contextMenu.js` (accesible, con teclado) y `ui/slideMenu.js` (qué ofrece cada tipo de slide).
 
 ## Cómo añadir…
 

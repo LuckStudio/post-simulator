@@ -7,6 +7,7 @@ const pagesFor = (patch) => {
   const rc = rcFor(patch);
   return buildPostPages(rc, postGeometry(rc));
 };
+const split = (post) => ({ post: { fit: 'split', ...post } });
 const LONG = Array.from({ length: 12 }, (_, i) => `Párrafo ${i}: ` + 'palabra '.repeat(30)).join('\n\n');
 
 describe('postGeometry', () => {
@@ -23,7 +24,7 @@ describe('postGeometry', () => {
 
 describe('buildPostPages', () => {
   it('modo dividir: reparte un texto largo en varias slides que caben', () => {
-    const rc = rcFor({ post: { text: LONG } });
+    const rc = rcFor(split({ text: LONG }));
     const G = postGeometry(rc);
     const pages = buildPostPages(rc, G);
     expect(pages.length).toBeGreaterThan(1);
@@ -36,22 +37,22 @@ describe('buildPostPages', () => {
   });
   it('modo dividir: solo la última lleva reacciones salvo que se pidan en todas', () => {
     expect(
-      pagesFor({ post: { text: LONG } })
+      pagesFor(split({ text: LONG }))
         .map((p) => p.footer)
         .slice(0, -1),
     ).not.toContain(true);
-    expect(pagesFor({ post: { text: LONG, footerEvery: true } }).every((p) => p.footer)).toBe(true);
+    expect(pagesFor(split({ text: LONG, footerEvery: true })).every((p) => p.footer)).toBe(true);
   });
   it('modo dividir: la cabecera se repite o no según la opción', () => {
     expect(
-      pagesFor({ post: { text: LONG, repeatHeader: false } })
+      pagesFor(split({ text: LONG, repeatHeader: false }))
         .map((p) => p.header)
         .slice(1),
     ).not.toContain(true);
   });
   it('no pierde texto al dividir', () => {
     const count = (s) => s.split(/\s+/).filter(Boolean).length;
-    const pages = pagesFor({ post: { text: LONG } });
+    const pages = pagesFor(split({ text: LONG }));
     const total = pages.reduce((a, p) => a + p.lines.reduce((b, l) => b + l.words.length, 0), 0);
     expect(total).toBe(count(LONG));
   });

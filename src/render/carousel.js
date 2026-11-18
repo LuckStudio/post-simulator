@@ -42,7 +42,7 @@ export function buildCarousel(state, assets) {
   if (state.cta.on) slides.push(...ctaSlides(rc, G));
   slides.forEach((s, i) => {
     s.index = i;
-    computeTimeline(s, state.anim);
+    computeTimeline(s, state.anim, { videoSeconds: assets.video?.duration });
   });
   rc.slideCount = slides.length;
   return { rc, slides };

@@ -151,6 +151,13 @@ export function ctaSlides(rc, G) {
       return card;
     });
 
-    return { type: 'cta', label: sets.length > 1 ? `Cierre ${si + 1}` : 'Cierre', hasMedia: false, items };
+    return {
+      type: 'cta',
+      label: sets.length > 1 ? `Cierre ${si + 1}` : 'Cierre',
+      hasMedia: false,
+      hasVideo: false,
+      parts: set,
+      items,
+    };
   });
 }

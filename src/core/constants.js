@@ -1,6 +1,8 @@
 /** Identificadores de la aplicación y de persistencia. */
 export const APP_ID = 'carrusel-ofertas';
 export const STORAGE_KEY = 'carrusel-ofertas-v1';
+export const PRESETS_KEY = 'carrusel-ofertas-presets-v1';
+export const PREFS_KEY = 'carrusel-ofertas-prefs-v1';
 
 /** Proporciones disponibles → tamaño nativo en píxeles [ancho, alto]. */
 export const FORMATS = {
@@ -17,6 +19,13 @@ export const FONTS = {
   inter: 'Inter, -apple-system, "Segoe UI", Roboto, Arial, sans-serif',
   source: '"Source Sans 3", -apple-system, "Segoe UI", Roboto, Arial, sans-serif',
 };
+
+/** Tipografías estándar (siempre disponibles): [clave, nombre]. */
+export const STANDARD_FONTS = [
+  ['system', 'Sistema (como la red social)'],
+  ['inter', 'Inter'],
+  ['source', 'Source Sans 3'],
+];
 
 /** Paleta de las slides (no de la interfaz). */
 export const THEMES = {
@@ -40,7 +49,7 @@ export const THEMES = {
 
 /** Reacciones propias (color de fondo + etiqueta). Los glifos están en render/icons.js. */
 export const REACTIONS = {
-  like: { c: '#3D7FE0', l: 'Me gusta' },
+  like: { c: '#3D7FE0', l: 'Recomendación' },
   love: { c: '#E5534B', l: 'Corazón' },
   star: { c: '#1F9D63', l: 'Estrella' },
   idea: { c: '#E8A531', l: 'Idea' },

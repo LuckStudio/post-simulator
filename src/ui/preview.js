@@ -11,9 +11,13 @@ const THUMB_HEIGHT = 96;
  * reproducción animada (incluido el vídeo del post).
  *
  * @param {{store: ReturnType<import('../state/store.js').createStore>,
- *          assets: ReturnType<import('../render/assets.js').createAssets>}} deps
+ *          assets: ReturnType<import('../render/assets.js').createAssets>,
+ *          onSlideMenu?: (target:object, x:number, y:number, opener:HTMLElement|null) => void,
+ *          onGhost?: (which:'cover'|'cta') => void}} deps
+ *   `onSlideMenu` se llama con clic derecho (o la tecla de menú) sobre una miniatura o la slide;
+ *   `onGhost` al pulsar el hueco de una portada o un cierre ocultos.
  */
-export function createPreview({ store, assets }) {
+export function createPreview({ store, assets, onSlideMenu = () => {}, onGhost = () => {} }) {
   const canvas = $('#preview');
   const pctx = canvas.getContext('2d');
   const wrap = $('#cwrap');
@@ -76,7 +80,7 @@ export function createPreview({ store, assets }) {
     $('#count').textContent = n ? `${sl.label} · ${view.cur + 1} de ${n}` : '—';
     $('#prevBtn').disabled = view.cur <= 0;
     $('#nextBtn').disabled = view.cur >= n - 1;
-    $$('#film button').forEach((b, i) => b.setAttribute('aria-current', i === view.cur ? 'true' : 'false'));
+    $$('#film button:not(.ghost)').forEach((b, i) => b.setAttribute('aria-current', i === view.cur ? 'true' : 'false'));
   }
 
   function go(i) {
@@ -91,9 +95,38 @@ export function createPreview({ store, assets }) {
     thumbTimer = setTimeout(renderThumbs, 220);
   }
 
+  /** Abre el menú contextual en el puntero o, si se abrió con el teclado, junto al elemento. */
+  function menuAt(e, el, target) {
+    e.preventDefault();
+    const r = el.getBoundingClientRect();
+    const fromKeyboard = e.clientX === 0 && e.clientY === 0;
+    if (target.kind === 'slide' && view.cur !== target.index) go(target.index);
+    onSlideMenu(target, fromKeyboard ? r.left : e.clientX, fromKeyboard ? r.bottom : e.clientY, el);
+  }
+
+  /** Hueco punteado que representa una portada o un cierre ocultos. */
+  function ghostButton(which) {
+    const label = which === 'cover' ? 'Portada' : 'Cierre';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ghost';
+    btn.setAttribute('aria-label', `Mostrar ${label.toLowerCase()} (oculta)`);
+    const box = document.createElement('span');
+    box.className = 'ghost-box';
+    box.textContent = '+';
+    box.style.aspectRatio = `${carousel.rc.W} / ${carousel.rc.H}`;
+    const text = document.createElement('span');
+    text.textContent = `${label} oculta`;
+    btn.append(box, text);
+    btn.onclick = () => onGhost(which);
+    btn.addEventListener('contextmenu', (e) => menuAt(e, btn, { kind: 'ghost', which }));
+    return btn;
+  }
+
   function renderThumbs() {
     const { rc, slides } = carousel;
     if (!rc) return;
+    film.querySelectorAll('.ghost').forEach((n) => n.remove());
     const { W, H } = rc;
     thumbBuf.width = W;
     thumbBuf.height = H;
@@ -106,6 +139,7 @@ export function createPreview({ store, assets }) {
         btn.type = 'button';
         btn.append(document.createElement('canvas'), document.createElement('span'));
         btn.onclick = () => go(Number(btn.dataset.i));
+        btn.addEventListener('contextmenu', (e) => menuAt(e, btn, { kind: 'slide', index: Number(btn.dataset.i) }));
         film.append(btn);
       }
       btn.dataset.i = i;
@@ -121,6 +155,9 @@ export function createPreview({ store, assets }) {
       drawSlide(bctx, rc, sl, null);
       c.getContext('2d').drawImage(thumbBuf, 0, 0, tw, th);
     });
+    const st = store.state;
+    if (!st.cover.on) film.prepend(ghostButton('cover'));
+    if (!st.cta.on) film.append(ghostButton('cta'));
     updateNav();
   }
 
@@ -222,6 +259,14 @@ export function createPreview({ store, assets }) {
     return was;
   }
 
+  /** Va a una slide y reproduce su animación. */
+  function playSlide(i) {
+    view.cur = clamp(i, 0, carousel.slides.length - 1);
+    updateNav();
+    if (view.mode === 'anim') restart();
+    else setMode('anim');
+  }
+
   function resume(wasPlaying) {
     if (wasPlaying && view.mode === 'anim') restart();
     else renderStatic();
@@ -230,6 +275,7 @@ export function createPreview({ store, assets }) {
   // ---------- Eventos ----------
 
   new ResizeObserver(() => fitCanvas()).observe(wrap);
+  canvas.addEventListener('contextmenu', (e) => menuAt(e, canvas, { kind: 'slide', index: view.cur }));
   $('#prevBtn').onclick = () => go(view.cur - 1);
   $('#nextBtn').onclick = () => go(view.cur + 1);
   document.addEventListener('keydown', (e) => {
@@ -254,6 +300,8 @@ export function createPreview({ store, assets }) {
     get mode() {
       return view.mode;
     },
+    go,
+    playSlide,
     invalidate,
     renderStatic,
     scheduleThumbs,

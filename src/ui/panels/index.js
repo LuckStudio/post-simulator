@@ -6,16 +6,18 @@ import { ctaPanel } from './cta.js';
 import { exportPanel } from './export.js';
 import { mediaPanel } from './media.js';
 import { postPanel } from './post.js';
+import { presetsPanel } from './presets.js';
 import { stylePanel } from './style.js';
 
 /** Secciones de la barra lateral: [id, etiqueta, icono, función que devuelve los nodos]. */
 const SECTIONS = [
   ['post', 'Post', 'post', postPanel],
-  ['media', 'Multimedia', 'media', mediaPanel],
+  ['media', 'Multimedia', 'media', mediaPanel, 'Medios'],
   ['cover', 'Portada', 'cover', coverPanel],
   ['cta', 'Cierre', 'cta', ctaPanel],
   ['style', 'Estilo', 'style', stylePanel],
   ['anim', 'Animación', 'anim', animPanel],
+  ['presets', 'Presets', 'presets', presetsPanel],
   ['export', 'Exportar', 'export', exportPanel],
 ];
 
@@ -36,7 +38,7 @@ export function createPanelHost(deps) {
 
   function renderTabs() {
     nav.replaceChildren(
-      ...SECTIONS.map(([id, label, icon]) =>
+      ...SECTIONS.map(([id, label, icon, , short]) =>
         h(
           'button',
           {
@@ -46,7 +48,10 @@ export function createPanelHost(deps) {
             onclick: () => select(id, { reveal: true }),
           },
           svgIcon(icon),
-          h('span', {}, label),
+          // En pantallas muy estrechas la etiqueta larga se sustituye por la corta (ver CSS).
+          short
+            ? [h('span', { class: 'lbl-full' }, label), h('span', { class: 'lbl-short' }, short)]
+            : h('span', {}, label),
         ),
       ),
     );

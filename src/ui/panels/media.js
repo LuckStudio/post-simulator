@@ -3,6 +3,7 @@ import { readImage, readImages } from '../../io/images.js';
 import { pdfToImages } from '../../io/pdf.js';
 import { toast } from '../feedback.js';
 import { h } from '../dom.js';
+import { videoDurationControls } from './duration.js';
 
 const pct = (v) => Math.round(v * 100) + ' %';
 
@@ -110,6 +111,15 @@ export function mediaPanel({ store, f, assets, actions }) {
         ],
       ),
     );
+    if (video) {
+      out.push(
+        f.group(
+          'Duración en la versión animada',
+          'Cuánto tiempo se ve la slide con el vídeo en el vídeo exportado y en la vista “Animado”.',
+          ...videoDurationControls({ store, f, assets }),
+        ),
+      );
+    }
   }
 
   if (m.type === 'document') {

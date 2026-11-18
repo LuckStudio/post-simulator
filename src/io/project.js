@@ -1,4 +1,5 @@
 import { APP_ID } from '../core/constants.js';
+import { UserError } from '../core/errors.js';
 
 /** ID del <script type="application/json"> que lleva el proyecto dentro del HTML visor. */
 export const EMBED_ID = 'carousel-state';
@@ -28,4 +29,4 @@ export function parseProjectFile(name, text) {
   }
 }
 
-export class UserError extends Error {}
+export { UserError };

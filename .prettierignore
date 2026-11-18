@@ -2,3 +2,7 @@ dist/
 legacy/
 package-lock.json
 /index.html
+/sw.js
+/manifest.webmanifest
+/icons
+/favicon.svg

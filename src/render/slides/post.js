@@ -60,7 +60,13 @@ export function postSlide(rc, pg, G, i, n) {
     const b = { x: G.cardX, y: cy + pos.actions, w: G.cardW, h: G.actH };
     card.children.push({ key: 'actions', box: b, draw: (ctx) => drawActions(ctx, rc, b) });
   }
-  return { type: 'post', label: n > 1 ? `Post ${i + 1}` : 'Post', hasMedia: pg.mediaH > 0, items: [card] };
+  return {
+    type: 'post',
+    label: n > 1 ? `Post ${i + 1}` : 'Post',
+    hasMedia: pg.mediaH > 0,
+    hasVideo: pg.mediaH > 0 && rc.state.media.type === 'video' && !!rc.assets.video,
+    items: [card],
+  };
 }
 
 function drawHeader(ctx, rc, b) {

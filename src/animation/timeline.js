@@ -18,14 +18,38 @@ export function flattenItems(slide) {
   return list;
 }
 
+const MAX_SLIDE_SECONDS = 300;
+const clampSeconds = (s) => Math.min(MAX_SLIDE_SECONDS, Math.max(1, Number(s) || 1));
+
+/**
+ * Duración total de una slide.
+ * - Slide con vídeo: 'full' = el vídeo entero (o la animación, si dura más); 'custom' = los segundos
+ *   indicados (más o menos que el vídeo); 'auto' = como las demás.
+ * - Resto: 'auto' = animación + pausa final; 'fixed' = los segundos indicados.
+ *
+ * @param {{animEnd:number, anim:object, hasVideo?:boolean, videoSeconds?:number}} o
+ */
+export function resolveSlideDuration({ animEnd, anim, hasVideo = false, videoSeconds = 0 }) {
+  if (hasVideo) {
+    const v = anim.videoDuration;
+    if (v?.mode === 'full' && Number.isFinite(videoSeconds) && videoSeconds > 0) {
+      return Math.max(animEnd, videoSeconds) + 0.2;
+    }
+    if (v?.mode === 'custom') return clampSeconds(v.seconds);
+  }
+  if (anim.duration?.mode === 'fixed') return clampSeconds(anim.duration.seconds);
+  return animEnd + anim.hold;
+}
+
 /**
  * Calcula cuándo empieza y cuánto dura la animación de cada elemento.
  * Escribe `_start`, `_dur` y `_type` en cada elemento y `total` en la slide.
  *
  * @param {object} slide  Slide construida (ver render/carousel.js).
  * @param {object} anim   Sección `anim` del estado.
+ * @param {{videoSeconds?:number}} [opts]  Duración del vídeo subido, si lo hay.
  */
-export function computeTimeline(slide, anim) {
+export function computeTimeline(slide, anim, opts = {}) {
   const list = flattenItems(slide);
   let prevStart = 0;
   let prevEnd = 0;
@@ -54,6 +78,11 @@ export function computeTimeline(slide, anim) {
     total = Math.max(total, start + dur);
   });
 
-  slide.total = total + anim.hold;
+  slide.total = resolveSlideDuration({
+    animEnd: total,
+    anim,
+    hasVideo: !!slide.hasVideo,
+    videoSeconds: opts.videoSeconds,
+  });
   return slide;
 }

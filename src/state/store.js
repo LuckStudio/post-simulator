@@ -1,5 +1,9 @@
 import { clone, getPath, setPath } from '../core/utils.js';
 import { createDefaultState } from './defaults.js';
+import { migrate } from './migrate.js';
+
+/** Claves que nunca se copian de datos externos (archivos importados). */
+const UNSAFE_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 
 /**
  * Mezcla `over` sobre `base` respetando la forma de `base`:
@@ -13,7 +17,10 @@ export function deepMerge(base, over) {
   if (base && typeof base === 'object') {
     const out = { ...base };
     if (over && typeof over === 'object') {
-      for (const k of Object.keys(over)) out[k] = k in base ? deepMerge(base[k], over[k]) : over[k];
+      for (const k of Object.keys(over)) {
+        if (UNSAFE_KEYS.has(k)) continue;
+        out[k] = k in base ? deepMerge(base[k], over[k]) : over[k];
+      }
     }
     return out;
   }
@@ -22,7 +29,7 @@ export function deepMerge(base, over) {
 
 /** Normaliza cualquier dato externo (localStorage, JSON importado…) a un estado completo. */
 export function hydrate(data) {
-  const copy = data && typeof data === 'object' ? { ...data } : {};
+  const copy = migrate(data);
   delete copy._app;
   return deepMerge(createDefaultState(), copy);
 }

@@ -1,9 +1,10 @@
 import { EASE_LABELS } from '../../animation/easing.js';
 import { EL_GROUPS, PRESETS, animTypesFor } from '../../animation/presets.js';
 import { h } from '../dom.js';
+import { slideDurationControls, videoDurationControls } from './duration.js';
 
 /** Pestaña "Animación": preset, ritmo y animación de cada elemento. */
-export function animPanel({ store, f, actions, rerender }) {
+export function animPanel({ store, f, assets, actions, rerender }) {
   const A = store.state.anim;
   const markCustom = () => {
     store.state.anim.preset = 'custom';
@@ -100,6 +101,12 @@ export function animPanel({ store, f, actions, rerender }) {
         null,
         els.map(([k, l]) => elementRow(k, l)),
       ),
+    ),
+    f.group(
+      'Duración de las slides',
+      'Cuánto se ve cada slide en el vídeo exportado y en la vista “Animado”.',
+      ...slideDurationControls({ store, f }),
+      store.state.media.type === 'video' && assets.video && videoDurationControls({ store, f, assets }),
     ),
     f.group(
       'Entre slides (vídeo continuo)',

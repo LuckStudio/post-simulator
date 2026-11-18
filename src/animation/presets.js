@@ -78,6 +78,31 @@ const preset = (map) => {
 };
 
 export const PRESETS = {
+  /** El punto de partida de la herramienta: como "Suave", pero uno tras otro y de arranque rápido. */
+  estandar: {
+    label: 'Estándar',
+    order: 'secuencial',
+    stagger: 0.16,
+    ease: 'outExpo',
+    el: preset({
+      card: ['slide-up', 0.7],
+      header: ['fade', 0.5],
+      text: ['lines', 1.4],
+      media: ['zoom-out', 0.9],
+      stats: ['count-up', 1.2],
+      actions: ['fade', 0.5],
+      coverImage: ['fade', 0.9],
+      kicker: ['fade', 0.5],
+      role: ['slide-up', 0.7],
+      company: ['fade', 0.5],
+      meta: ['lines', 0.9],
+      coverFooter: ['fade', 0.5],
+      ctaIcon: ['pop', 0.6],
+      ctaTitle: ['slide-up', 0.6],
+      ctaText: ['fade', 0.6],
+      ctaButton: ['pop', 0.6],
+    }),
+  },
   suave: {
     label: 'Suave',
     order: 'cascada',

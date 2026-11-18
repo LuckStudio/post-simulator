@@ -28,6 +28,7 @@ function loadPlaywright() {
 }
 const { chromium } = loadPlaywright();
 const { PRESETS } = await import('../src/animation/presets.js');
+const { deepMerge } = await import('../src/state/store.js');
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const LEGACY = pathToFileURL(path.join(root, 'legacy/carrusel-ofertas.html')).href;
@@ -45,6 +46,21 @@ const LONG_TEXT = Array.from(
 ).join('\n\n');
 
 /** Variantes: parches parciales sobre el proyecto por defecto. */
+/**
+ * Los valores estándar de la herramienta han cambiado a propósito desde la versión original
+ * (avatar redondo, ajuste automático, degradado, sombra de 50 px…). Para comparar el *dibujo*
+ * y no los valores por defecto, ambos programas reciben aquí los valores antiguos de forma
+ * explícita. `v: 2` evita que la migración de la build nueva los vuelva a cambiar.
+ */
+const LEGACY_BASE = {
+  v: 2,
+  author: { shape: 'square' },
+  post: { fit: 'split' },
+  stats: { types: ['like', 'love', 'star'] },
+  style: { bgMode: 'theme', bg: '#F4F2EE', bg2: '#DCE4EE', shadowBlur: 44 },
+  anim: { preset: 'suave', order: 'cascada', ease: 'outCubic' },
+};
+
 const VARIANTS = {
   'por defecto': {},
   'tema oscuro': { style: { theme: 'dark', accent: '#71B7FB' } },
@@ -103,7 +119,7 @@ async function capture(browser, url, patch, { animate = false } = {}) {
         /* sin almacenamiento */
       }
     },
-    [STORAGE_KEY, Object.keys(patch).length ? JSON.stringify(patch) : null],
+    [STORAGE_KEY, JSON.stringify(deepMerge(LEGACY_BASE, patch))],
   );
   await page.goto(url);
   await page.clock.runFor(1000);

@@ -18,7 +18,7 @@ import { PRESETS } from '../animation/presets.js';
  * @property {object} anim              Preset, ritmo y animación por elemento (el).
  */
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 /** @type {ProjectState} */
 export const DEFAULT_STATE = {
@@ -30,14 +30,14 @@ export const DEFAULT_STATE = {
     time: '2 h',
     globe: true,
     avatar: null,
-    shape: 'square',
+    shape: 'circle',
     initials: 'EN',
     avatarColor: '#2E5E4E',
     follow: true,
   },
   post: {
     text: '¡Seguimos creciendo! 🚀\n\nBuscamos un/a Diseñador/a de Producto Senior que quiera liderar la experiencia de nuestras apps para clientes de retail y cultura.\n\nQué harás:\n→ Diseñar flujos completos, del research al prototipo.\n→ Trabajar codo con codo con desarrollo y negocio.\n→ Definir y mantener nuestro sistema de diseño.\n\nQué buscamos:\n→ 5 años o más diseñando producto digital.\n→ Dominio de Figma y prototipado.\n→ Ganas de explicar el porqué de cada decisión.\n\nOfrecemos modelo híbrido en Madrid, horario flexible y presupuesto anual de formación.\n\n¿Te interesa o conoces a alguien? Escríbenos o comparte este post 👇\n\n#empleo #diseño #UX #producto #Madrid',
-    fit: 'split',
+    fit: 'auto',
     size: 34,
     autoMin: 24,
     autoMax: 46,
@@ -65,7 +65,7 @@ export const DEFAULT_STATE = {
     reactions: 128,
     comments: 14,
     reposts: 6,
-    types: ['like', 'love', 'star'],
+    types: ['like', 'idea', 'love'],
     actions: true,
     labels: ['Recomendar', 'Comentar', 'Compartir', 'Enviar'],
   },
@@ -97,29 +97,34 @@ export const DEFAULT_STATE = {
   },
   style: {
     theme: 'light',
-    bgMode: 'theme',
-    bg: '#F4F2EE',
-    bg2: '#DCE4EE',
+    bgMode: 'gradient',
+    bg: '#f2f2f2',
+    bg2: '#ebedf0',
     bgImage: null,
     bgDim: 0.2,
     accent: '#0A66C2',
     font: 'system',
     radius: 16,
     shadow: true,
+    shadowBlur: 50,
     margin: 64,
     pager: true,
     footerHandle: true,
   },
   anim: {
-    preset: 'suave',
-    order: 'cascada',
+    preset: 'estandar',
+    order: 'secuencial',
     stagger: 0.16,
     hold: 2.5,
-    ease: 'outCubic',
+    ease: 'outExpo',
     cps: 45,
     transition: 'deslizar',
     fps: 30,
-    el: clone(PRESETS.suave.el),
+    // Duración de las slides: 'auto' = animación + pausa; 'fixed' = los segundos indicados.
+    duration: { mode: 'auto', seconds: 6 },
+    // Slide con vídeo: 'full' = vídeo completo; 'custom' = los segundos indicados; 'auto' = como las demás.
+    videoDuration: { mode: 'full', seconds: 10 },
+    el: clone(PRESETS.estandar.el),
   },
 };
 

@@ -21,9 +21,18 @@ export function canvasSize(format) {
   return { W, H, S: Math.min(W, H) / 1080 };
 }
 
+/** Pila tipográfica de una clave estándar o de cualquier nombre de fuente instalada. */
+export function fontFamily(fontKey) {
+  if (FONTS[fontKey]) return FONTS[fontKey];
+  const name = String(fontKey || '')
+    .replace(/["\\;{}<>]/g, '')
+    .trim();
+  return name ? `"${name}", ${FONTS.system}` : FONTS.system;
+}
+
 /** Devuelve una función (peso, tamaño) → valor de `ctx.font` para la tipografía elegida. */
 export function fontFn(fontKey) {
-  const family = FONTS[fontKey] || FONTS.system;
+  const family = fontFamily(fontKey);
   return (w, s) => `${w} ${Math.round(s * 10) / 10}px ${family}`;
 }
 

@@ -41,7 +41,7 @@ export function drawCard(ctx, rc, b) {
   ctx.save();
   if (st.shadow) {
     ctx.shadowColor = st.theme === 'dark' ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.10)';
-    ctx.shadowBlur = 44 * S;
+    ctx.shadowBlur = (st.shadowBlur ?? 44) * S;
     ctx.shadowOffsetY = 10 * S;
   }
   ctx.fillStyle = t.card;
