@@ -31,6 +31,7 @@ import { saveFile } from './io/files.js';
 import { detectInstalledFonts } from './io/fonts.js';
 import { parseProjectFile } from './io/project.js';
 import { createInstallPrompt, requestPersistence, storageStatus } from './pwa.js';
+import { applyUiSettings } from './ui/appearance.js';
 import { createContextMenu } from './ui/contextMenu.js';
 import { $, h } from './ui/dom.js';
 import { createRecorderDialog, toast } from './ui/feedback.js';
@@ -231,9 +232,23 @@ export function startApp() {
     },
   };
 
+  const ui = {
+    get: () => prefs.get().ui,
+    set(key, value) {
+      applyUiSettings(prefs.setUi({ [key]: value }));
+      panels.render();
+    },
+    reset() {
+      applyUiSettings(prefs.resetUi());
+      panels.render();
+      toast('Configuración de la herramienta restablecida.');
+    },
+  };
+
   const actions = {
     presets,
     pwa,
+    ui,
 
     exportPngCurrent: () =>
       withStaticPreview(({ rc, slides }) => exportSlidePng({ rc, slide: slides[preview.current], notify: toast })),
@@ -411,8 +426,14 @@ export function startApp() {
     e.target.value = '';
   };
 
+  applyUiSettings(prefs.get().ui);
+  // Si la apariencia es automática, sigue al sistema también para el color de la barra.
+  window
+    .matchMedia?.('(prefers-color-scheme: dark)')
+    .addEventListener?.('change', () => applyUiSettings(prefs.get().ui));
   mountStaticIcons();
   $('#exportGo').onclick = () => panels.select('export', { reveal: true });
+  $('#settingsGo').onclick = () => panels.select('settings', { reveal: true });
   $('#slideMenuBtn').onclick = (e) => {
     const btn = e.currentTarget;
     openSlideMenu(

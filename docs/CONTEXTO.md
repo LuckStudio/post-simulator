@@ -71,6 +71,15 @@ Herramienta web (un único HTML) para crear **carruseles de Instagram con estét
   - Tipografías: estándar, recientes y todas las instaladas (o escribir el nombre).
   - Presets en localStorage con importar/exportar; PWA instalable y sin conexión; almacenamiento persistente.
 
+- **v0.5 — presentación y configuración.**
+  - Pestaña _Configuración_: apariencia de la interfaz (automática, clara, oscura) y densidad (cómoda,
+    compacta), ampliable a nuevas formas de verla; incluye el estado de la app y los datos.
+  - Iconos de la app rediseñados (tarjeta de post con carrusel detrás) y logo en la barra lateral.
+  - Vista previa al compartir el enlace (Open Graph/Twitter, imagen 1200×630) y capturas en el manifiesto.
+  - README con capturas generadas automáticamente desde la build (modo claro).
+  - Corregido: el estado del almacenamiento mostraba `[object HTMLBRElement]` cuando el navegador
+    informaba del espacio usado.
+
 ## Limitaciones conocidas
 
 - El vídeo subido dentro del post no se guarda en JSON ni en HTML; hay que resubirlo al importar.

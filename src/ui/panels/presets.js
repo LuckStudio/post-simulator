@@ -6,8 +6,6 @@ import { svgIcon } from '../icons.js';
 const draft = { name: '', sections: new Set(DEFAULT_SECTIONS) };
 
 const fmtDate = (ts) => new Date(ts).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
-const fmtBytes = (n) =>
-  n < 1024 * 1024 ? Math.max(1, Math.round(n / 1024)) + ' KB' : (n / 1024 / 1024).toFixed(1) + ' MB';
 
 /** Pestaña "Presets": guardar, aplicar, importar y exportar ajustes; estado de la app y los datos. */
 export function presetsPanel({ f, actions }) {
@@ -128,33 +126,5 @@ export function presetsPanel({ f, actions }) {
     ),
   );
 
-  // ----- App y datos -----
-  const status = h('p', { class: 'hint' }, 'Comprobando el almacenamiento…');
-  const buttons = h('div', { class: 'btn-col' });
-  actions.pwa.status().then((s) => {
-    const yes = (b) => (b ? 'sí' : 'no');
-    status.replaceChildren(
-      h('span', {}, `Datos protegidos contra borrado automático: ${yes(s.persisted)}`),
-      h('br'),
-      h('span', {}, `Disponible sin conexión: ${yes(s.offlineReady)}`),
-      h('br'),
-      h('span', {}, `Instalada como app: ${yes(s.standalone)}`),
-      s.usage != null && [h('br'), h('span', {}, `Espacio usado: ${fmtBytes(s.usage)}`)],
-    );
-    buttons.replaceChildren(
-      ...[
-        !s.persisted && f.button('Proteger mis datos', actions.pwa.protect, { cls: 'btn' }),
-        actions.pwa.canInstall() && f.button('Instalar como app', actions.pwa.install, { cls: 'btn primary' }),
-      ].filter(Boolean),
-    );
-  });
-  const appGroup = f.group(
-    'Esta app y tus datos',
-    'Los presets y el proyecto se guardan en este navegador. Instalada como app y con los datos protegidos, el navegador no los borra por su cuenta.',
-    status,
-    buttons,
-    f.hint('En iPhone o iPad: Compartir → Añadir a pantalla de inicio.'),
-  );
-
-  return [saveGroup, listGroup, ioGroup, appGroup];
+  return [saveGroup, listGroup, ioGroup];
 }

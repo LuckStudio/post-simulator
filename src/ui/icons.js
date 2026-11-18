@@ -13,6 +13,7 @@ export const UI_ICON = {
   anim: 'M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6',
   export: 'M12 3v12M7 10l5 5 5-5M4 21h16',
   presets: 'M7 4h10v17l-5-4-5 4z',
+  settings: 'M4 7h9M17 7h3M15 5v4M4 17h3M11 17h9M9 15v4',
   prev: 'M15 6l-6 6 6 6',
   eye: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z',
   eyeOff:

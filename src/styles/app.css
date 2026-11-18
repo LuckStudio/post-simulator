@@ -121,8 +121,7 @@ textarea {
   width: 40px;
   height: 40px;
   border-radius: 8px;
-  background: var(--accent);
-  color: var(--accent-ink);
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -960,6 +959,82 @@ input[type='color'] {
   }
   .toast {
     bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* ---------- Configuración: densidad compacta ---------- */
+:root[data-density='compact'] {
+  --rail-w: 76px;
+  --panel-w: 320px;
+}
+:root[data-density='compact'] body {
+  font-size: 14px;
+}
+:root[data-density='compact'] .rail-btn {
+  width: 66px;
+  padding: 6px 0;
+  font-size: 10.5px;
+}
+:root[data-density='compact'] .lbl-full {
+  display: none;
+}
+:root[data-density='compact'] .lbl-short {
+  display: inline;
+}
+:root[data-density='compact'] .panel-head {
+  padding: 14px 16px 2px;
+}
+:root[data-density='compact'] .panel-head h2 {
+  font-size: 18px;
+}
+:root[data-density='compact'] .panel-body {
+  padding: 0 16px 32px;
+}
+:root[data-density='compact'] .group {
+  padding: 12px 0;
+}
+:root[data-density='compact'] .group h3 {
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+:root[data-density='compact'] .field {
+  gap: 4px;
+  margin-bottom: 8px;
+}
+:root[data-density='compact'] input[type='text'],
+:root[data-density='compact'] input[type='number'],
+:root[data-density='compact'] textarea,
+:root[data-density='compact'] select {
+  padding: 6px 9px;
+  font-size: 13px;
+}
+:root[data-density='compact'] .btn {
+  min-height: 34px;
+  padding: 5px 14px;
+  font-size: 13px;
+}
+:root[data-density='compact'] .btn.icon {
+  width: 34px;
+  padding: 0;
+}
+:root[data-density='compact'] .toolbar {
+  padding: 8px 16px;
+}
+:root[data-density='compact'] .film button canvas,
+:root[data-density='compact'] .film button.ghost .ghost-box {
+  height: 64px;
+}
+
+/* El engranaje de la barra superior solo hace falta cuando la barra de iconos pasa abajo */
+.only-narrow {
+  display: none !important;
+}
+@media (max-width: 900px) {
+  .only-narrow {
+    display: inline-flex !important;
+  }
+  .rail-settings {
+    display: none !important;
   }
 }
 

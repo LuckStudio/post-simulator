@@ -7,6 +7,7 @@ import { exportPanel } from './export.js';
 import { mediaPanel } from './media.js';
 import { postPanel } from './post.js';
 import { presetsPanel } from './presets.js';
+import { settingsPanel } from './settings.js';
 import { stylePanel } from './style.js';
 
 /** Secciones de la barra lateral: [id, etiqueta, icono, función que devuelve los nodos]. */
@@ -19,7 +20,12 @@ const SECTIONS = [
   ['anim', 'Animación', 'anim', animPanel],
   ['presets', 'Presets', 'presets', presetsPanel],
   ['export', 'Exportar', 'export', exportPanel],
+  ['settings', 'Configuración', 'settings', settingsPanel, 'Ajustes'],
 ];
+
+/** Clases extra de cada botón de la barra: Exportar abre el grupo inferior; Configuración va
+ * al engranaje de la barra superior en pantallas estrechas. */
+const RAIL_CLASS = { export: 'rail-end', settings: 'rail-settings' };
 
 /** En pantallas estrechas el panel queda debajo de la vista previa. */
 const isNarrow = () => window.matchMedia('(max-width: 900px)').matches;
@@ -43,7 +49,7 @@ export function createPanelHost(deps) {
           'button',
           {
             type: 'button',
-            class: id === 'export' ? 'rail-btn rail-end' : 'rail-btn',
+            class: RAIL_CLASS[id] ? `rail-btn ${RAIL_CLASS[id]}` : 'rail-btn',
             'aria-current': id === active ? 'page' : 'false',
             onclick: () => select(id, { reveal: true }),
           },

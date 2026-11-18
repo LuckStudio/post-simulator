@@ -2,7 +2,7 @@
  * - Páginas: red primero (así llegan las versiones nuevas) y, si no hay red, la copia guardada.
  * - Resto (iconos, fuentes de Google): se sirve lo guardado y se refresca en segundo plano.
  * Los presets y el proyecto viven en localStorage, no aquí. */
-const CACHE = 'estudio-carruseles-v1';
+const CACHE = 'estudio-carruseles-v2';
 const SHELL = [
   './',
   './index.html',

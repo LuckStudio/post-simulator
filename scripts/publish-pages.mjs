@@ -15,4 +15,4 @@ if (!existsSync(path.join(dist, 'index.html'))) {
 cpSync(dist, root, { recursive: true });
 // Evita que Pages procese el sitio con Jekyll.
 writeFileSync(path.join(root, '.nojekyll'), '');
-console.log('Publicado en la raíz: index.html, manifest.webmanifest, sw.js, icons/, favicon.svg');
+console.log('Publicado en la raíz: index.html y los archivos de src/public (PWA, iconos, capturas, og-image.jpg)');

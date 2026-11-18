@@ -7,11 +7,57 @@
     <meta name="theme-color" content="#0a66c2" />
     <meta
       name="description"
-      content="Crea carruseles de Instagram con estética de post profesional para tus ofertas de empleo."
+      content="Convierte tus ofertas de empleo en carruseles para Instagram con estética de post profesional. Gratis, sin registro y funciona sin conexión."
     />
+    <link rel="canonical" href="https://luckstudio.github.io/post-simulator/" />
+
+    <!-- App instalable (PWA) e iconos -->
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/icons/favicon-32.png" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="application-name" content="Carruseles" />
+    <meta name="apple-mobile-web-app-title" content="Carruseles" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+    <!-- Vista previa al compartir el enlace (WhatsApp, Telegram, LinkedIn, Slack, iMessage, X…).
+         Las URL tienen que ser absolutas: si cambia la dirección de la web, cámbialas aquí. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Estudio de carruseles" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:url" content="https://luckstudio.github.io/post-simulator/" />
+    <meta property="og:title" content="Estudio de carruseles · Ofertas de empleo que se ven profesionales" />
+    <meta
+      property="og:description"
+      content="Convierte tus ofertas de empleo en carruseles para Instagram con estética de post profesional. Gratis, sin registro y funciona sin conexión."
+    />
+    <meta property="og:image" content="https://luckstudio.github.io/post-simulator/og-image.jpg" />
+    <meta property="og:image:secure_url" content="https://luckstudio.github.io/post-simulator/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Tres slides de un carrusel de oferta de empleo: portada con el puesto, el post y el cierre."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Estudio de carruseles · Ofertas de empleo que se ven profesionales" />
+    <meta
+      name="twitter:description"
+      content="Convierte tus ofertas de empleo en carruseles para Instagram con estética de post profesional. Gratis, sin registro y funciona sin conexión."
+    />
+    <meta name="twitter:image" content="https://luckstudio.github.io/post-simulator/og-image.jpg" />
+    <script>
+      // Aplica la apariencia guardada antes de pintar (evita un destello claro en modo oscuro).
+      // Misma lógica que src/ui/appearance.js.
+      try {
+        var ui = JSON.parse(localStorage.getItem('carrusel-ofertas-prefs-v1') || '{}').ui || {};
+        if (ui.appearance === 'light' || ui.appearance === 'dark')
+          document.documentElement.dataset.theme = ui.appearance;
+        if (ui.density === 'compact') document.documentElement.dataset.density = 'compact';
+      } catch (e) {}
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -22,7 +68,33 @@
   <body>
     <div class="app">
       <nav class="rail" aria-label="Secciones">
-        <div class="rail-brand" title="Estudio de carruseles" data-icon="brand" data-icon-size="22"></div>
+        <div class="rail-brand" title="Estudio de carruseles">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="40" height="40" aria-hidden="true">
+            <defs>
+              <linearGradient id="marcaFondo" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#2386e6" />
+                <stop offset="1" stop-color="#0a4f9e" />
+              </linearGradient>
+              <filter id="marcaSombra" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#04264d" flood-opacity=".35" />
+              </filter>
+            </defs>
+            <rect width="512" height="512" rx="112" fill="url(#marcaFondo)" />
+            <g transform="translate(256 256) scale(1) translate(-256 -256)">
+              <rect x="66" y="152" width="124" height="196" rx="24" fill="#fff" opacity=".32" />
+              <rect x="322" y="152" width="124" height="196" rx="24" fill="#fff" opacity=".32" />
+              <g filter="url(#marcaSombra)">
+                <rect x="144" y="112" width="224" height="276" rx="30" fill="#fff" />
+              </g>
+              <circle cx="200" cy="176" r="30" fill="#0a66c2" />
+              <rect x="176" y="236" width="160" height="26" rx="13" fill="#1f2a37" opacity=".85" />
+              <rect x="176" y="284" width="110" height="26" rx="13" fill="#0a66c2" />
+              <circle cx="226" cy="430" r="9" fill="#fff" opacity=".5" />
+              <circle cx="256" cy="430" r="9" fill="#fff" />
+              <circle cx="286" cy="430" r="9" fill="#fff" opacity=".5" />
+            </g>
+          </svg>
+        </div>
         <div class="rail-tabs" id="tabs"></div>
       </nav>
 
@@ -45,6 +117,14 @@
           <button class="btn" id="replayBtn" type="button" hidden>Repetir</button>
           <label class="btn" id="allWrap" hidden><input type="checkbox" id="playAll" /> Todo el carrusel</label>
           <div class="spacer"></div>
+          <button
+            class="btn icon only-narrow"
+            id="settingsGo"
+            type="button"
+            aria-label="Configuración"
+            data-icon="settings"
+            data-icon-size="20"
+          ></button>
           <button class="btn primary" id="exportGo" type="button">Exportar</button>
         </div>
 

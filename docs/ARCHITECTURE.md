@@ -109,6 +109,15 @@ transformaciones de caja (fundido, desplazamiento, escala, recorte, desenfoque�
   en la slide con vídeo, vídeo completo / personalizada.
 - Menú contextual: `ui/contextMenu.js` (accesible, con teclado) y `ui/slideMenu.js` (qué ofrece cada tipo de slide).
 
+## Configuración de la herramienta
+
+La pestaña _Configuración_ pinta automáticamente los ajustes del registro `UI_SETTINGS`
+(`core/uiSettings.js`): hoy apariencia (automática, clara, oscura) y densidad (cómoda, compacta).
+Cada ajuste se refleja como un atributo en `<html>` (`data-theme`, `data-density`) que usa el CSS; la
+opción por defecto no pone atributo. Se guardan en las preferencias del navegador (`state/prefs.js`) y un
+script en línea de `src/index.html` los aplica antes de pintar para evitar parpadeos. **Para añadir una
+forma nueva de ver la herramienta**: una entrada en `UI_SETTINGS` y su CSS; la pestaña la muestra sola.
+
 ## Cómo añadir…
 
 - **Un campo nuevo al proyecto**: añádelo a `DEFAULT_STATE` (`state/defaults.js`). Los

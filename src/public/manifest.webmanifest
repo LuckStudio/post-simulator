@@ -1,7 +1,7 @@
 {
   "name": "Estudio de carruseles de ofertas",
   "short_name": "Carruseles",
-  "description": "Crea carruseles de Instagram con estética de post profesional para tus ofertas de empleo.",
+  "description": "Convierte tus ofertas de empleo en carruseles para Instagram con estética de post profesional. Gratis, sin registro y funciona sin conexión.",
   "lang": "es",
   "id": "./",
   "start_url": "./",
@@ -12,9 +12,45 @@
   "background_color": "#f4f2ee",
   "categories": ["productivity", "business"],
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
-    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/escritorio.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Editor con la barra de iconos, los ajustes y la vista previa del carrusel"
+    },
+    {
+      "src": "screenshots/movil.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Vista previa del carrusel en el móvil"
+    }
   ]
 }

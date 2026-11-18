@@ -58,6 +58,10 @@ describe('prefs', () => {
     createPrefs(st).setInstalledFonts(['X', 'Y']);
     expect(createPrefs(st).get().fontsInstalled).toEqual(['X', 'Y']);
     st.setItem('carrusel-ofertas-prefs-v1', '{roto');
-    expect(createPrefs(st).get()).toEqual({ fontsRecent: [], fontsInstalled: [] });
+    expect(createPrefs(st).get()).toEqual({
+      fontsRecent: [],
+      fontsInstalled: [],
+      ui: { appearance: 'system', density: 'comfortable' },
+    });
   });
 });
