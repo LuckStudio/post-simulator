@@ -4,7 +4,7 @@ export function ctaPanel({ store, f }) {
   return [
     f.group(
       'Mostrar cierre',
-      'La última slide invita a seguir la cuenta o a escribir.',
+      'Una última slide opcional que invita a seguir la cuenta o a escribir.',
       f.toggle('Incluir cierre', 'cta.on', { rebuild: true }),
     ),
     C.on && [
@@ -14,14 +14,14 @@ export function ctaPanel({ store, f }) {
         f.seg('', 'cta.mode', {
           both: 'Ambos en una slide',
           separate: 'Dos slides',
-          seek: 'Solo candidatos',
-          offer: 'Solo empresas',
+          seek: 'Solo seguir',
+          offer: 'Solo contactar',
         }),
         f.text('Usuario o cuenta', 'cta.handle', { ph: '@tucuenta' }),
       ),
       C.mode !== 'offer' &&
         f.group(
-          'Para quien busca trabajo',
+          'Mensaje para seguir la cuenta',
           null,
           f.text('Título', 'cta.seekTitle'),
           f.text('Texto', 'cta.seekText', { area: true, rows: 2 }),
@@ -29,7 +29,7 @@ export function ctaPanel({ store, f }) {
         ),
       C.mode !== 'seek' &&
         f.group(
-          'Para quien ofrece un puesto',
+          'Mensaje para contactar',
           null,
           f.text('Título', 'cta.offerTitle'),
           f.text('Texto', 'cta.offerText', { area: true, rows: 2 }),

@@ -2,7 +2,8 @@
  * - Páginas: red primero (así llegan las versiones nuevas) y, si no hay red, la copia guardada.
  * - Resto (iconos, fuentes de Google): se sirve lo guardado y se refresca en segundo plano.
  * Los presets y el proyecto viven en localStorage, no aquí. */
-const CACHE = 'estudio-carruseles-v2';
+const CACHE = 'post-simulator-v1';
+const OLD_PREFIXES = ['estudio-carruseles-', 'post-simulator-'];
 const SHELL = [
   './',
   './index.html',
@@ -28,7 +29,7 @@ self.addEventListener('activate', (event) => {
       .keys()
       .then((keys) =>
         Promise.all(
-          keys.filter((k) => k.startsWith('estudio-carruseles-') && k !== CACHE).map((k) => caches.delete(k)),
+          keys.filter((k) => OLD_PREFIXES.some((pre) => k.startsWith(pre)) && k !== CACHE).map((k) => caches.delete(k)),
         ),
       )
       .then(() => self.clients.claim()),

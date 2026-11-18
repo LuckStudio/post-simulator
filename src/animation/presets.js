@@ -43,8 +43,8 @@ export const EL_GROUPS = [
     [
       ['coverImage', 'Imagen'],
       ['kicker', 'Etiqueta'],
-      ['role', 'Puesto'],
-      ['company', 'Empresa'],
+      ['role', 'Título'],
+      ['company', 'Subtítulo'],
       ['meta', 'Detalles'],
       ['coverFooter', 'Pie'],
     ],

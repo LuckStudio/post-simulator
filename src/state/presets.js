@@ -6,7 +6,7 @@ import { deepMerge, hydrate } from './store.js';
 /**
  * Presets: conjuntos de ajustes con nombre que se guardan en este navegador (localStorage)
  * y se pueden exportar e importar como JSON. Un preset guarda solo las secciones elegidas,
- * nunca el contenido de la oferta (texto del post, multimedia).
+ * nunca el contenido de la publicación (texto del post, multimedia).
  *
  * @typedef {object} Preset
  * @property {string} id

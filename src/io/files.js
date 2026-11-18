@@ -41,8 +41,9 @@ export async function saveFile(name, data, notify = () => {}) {
   notify('Descargando ' + name);
 }
 
-/** Nombre base de los archivos exportados: el puesto o, si no hay, el autor. */
-export const projectBaseName = (state) => slug(state.cover.role || state.author.name);
+/** Nombre base de los archivos exportados: el título de la portada (si hay) o el nombre del autor. */
+export const projectBaseName = (state) =>
+  slug((state.cover.on && state.cover.role) || state.author.name || 'publicacion');
 
 /** "01-portada", "02-post-1"… */
 export const slideFileName = (slide) => `${String(slide.index + 1).padStart(2, '0')}-${slug(slide.label)}`;

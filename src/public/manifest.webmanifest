@@ -1,7 +1,7 @@
 {
-  "name": "Estudio de carruseles de ofertas",
-  "short_name": "Carruseles",
-  "description": "Convierte tus ofertas de empleo en carruseles para Instagram con estética de post profesional. Gratis, sin registro y funciona sin conexión.",
+  "name": "Post Simulator",
+  "short_name": "Post Simulator",
+  "description": "Simula cómo se verá tu publicación antes de subirla: texto, imágenes, vídeo, documentos y carruseles con estética de post profesional. Gratis, sin registro y funciona sin conexión.",
   "lang": "es",
   "id": "./",
   "start_url": "./",
@@ -10,7 +10,7 @@
   "orientation": "any",
   "theme_color": "#0a66c2",
   "background_color": "#f4f2ee",
-  "categories": ["productivity", "business"],
+  "categories": ["productivity", "photo", "social"],
   "icons": [
     {
       "src": "icons/icon-192.png",

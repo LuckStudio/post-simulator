@@ -7,7 +7,7 @@ import { drawCover, ellip, rr } from '../primitives.js';
 import { charCount, drawText, textMode, wrapText } from '../text.js';
 
 /**
- * Portada: etiqueta, puesto, empresa, detalles (ubicación, modalidad, contrato,
+ * Portada: etiqueta, título, subtítulo, detalles (lugar, formato, categoría,
  * salario) y pie con autor e invitación a deslizar.
  * Dos diseños: 'card' (tarjeta con franja de imagen) y 'full' (imagen a sangre).
  */
@@ -79,7 +79,7 @@ export function coverSlide(rc, G) {
     return { h, pos, roleLines, compLines };
   };
 
-  // El puesto empieza grande y se reduce hasta que todo cabe (y ocupa como mucho 4 líneas).
+  // El título empieza grande y se reduce hasta que todo cabe (y ocupa como mucho 4 líneas).
   let rs = 92 * S;
   let ms = measure(rs);
   const avail = full ? G.H - 2 * G.M - 140 * S : G.maxH - bandH - 2 * pad;

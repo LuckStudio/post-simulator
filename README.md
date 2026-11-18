@@ -1,12 +1,12 @@
 <div align="center">
 
-<img src="src/public/app-icon.svg" width="112" height="112" alt="Icono de Estudio de carruseles">
+<img src="src/public/app-icon.svg" width="112" height="112" alt="Icono de Post Simulator">
 
-# Estudio de carruseles
+# Post Simulator
 
-**Tus ofertas de empleo, convertidas en carruseles de Instagram con estética de post profesional.**
+**Simula cómo se verá tu publicación antes de subirla.**
 
-Escribe la oferta y sale lista para publicar: portada con el puesto, el post y un cierre que invita a seguirte o a escribirte. En imagen o en vídeo animado.
+Texto, imágenes, vídeo, documentos y carruseles con la estética de un post profesional. Pruébalo en pantalla y expórtalo en imagen o en vídeo animado, listo para publicar.
 
 [**Abrir la herramienta →**](https://luckstudio.github.io/post-simulator/)
 
@@ -22,15 +22,15 @@ Gratis · Sin registro · Funciona sin conexión · Se instala como app
 
 ## Así queda
 
-Tres slides en formato 4:5 (1080 × 1350 px), las que más espacio ocupan en el feed de Instagram:
+Un carrusel de ejemplo (portada, publicación con imagen y cierre) en formato 4:5 (1080 × 1350 px), el que más espacio ocupa en el feed de Instagram. Todo el contenido es de relleno: cámbialo por el tuyo.
 
-<img src="docs/img/slides.png" alt="Las tres slides del carrusel: portada con el puesto, el post con reacciones y el cierre con las llamadas a la acción">
+<img src="docs/img/slides.png" alt="Las tres slides de un carrusel de ejemplo: portada con título y detalles, publicación con imagen y reacciones, y cierre con llamadas a la acción">
 
 <br>
 
 ## Cómo se usa
 
-1. **Escribe la oferta.** Pega el texto del post y rellena el puesto, la empresa, la ubicación y el salario.
+1. **Escribe tu publicación.** Nombre de la cuenta, texto y una imagen, un vídeo o un documento. Si quieres un carrusel, añade una portada y un cierre.
 2. **Dale tu estilo.** Avatar, colores, tipografía, fondo y animación… o aplica un preset guardado con un clic.
 3. **Exporta.** Descarga las imágenes en un ZIP o un vídeo animado y súbelo a Instagram.
 
@@ -67,7 +67,7 @@ Tres slides en formato 4:5 (1080 × 1350 px), las que más espacio ocupan en el 
   <tr>
     <td width="50%" valign="top">
       <h3>🔖 Presets: tu marca en un clic</h3>
-      <p>Guarda estilo, autor, animación, reacciones y cierre con un nombre, y aplícalos a la siguiente oferta. Marca uno para que sea tu punto de partida y pásaselos a tu equipo como archivo.</p>
+      <p>Guarda estilo, autor, animación, reacciones y cierre con un nombre, y aplícalos a la siguiente publicación. Marca uno para que sea tu punto de partida y pásaselos a tu equipo como archivo.</p>
       <img src="docs/img/presets.png" alt="Pestaña de Presets con dos presets guardados, uno marcado como inicial">
     </td>
     <td width="50%" valign="top">

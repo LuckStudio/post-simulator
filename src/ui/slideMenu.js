@@ -87,7 +87,7 @@ export function buildSlideMenu({ target, store, panels, preview, actions, toast 
       items.push(
         { label: 'Juntar en una sola slide', icon: 'split', onSelect: change('cta.mode', 'both') },
         {
-          label: `Quitar esta slide (dejar solo ${only === 'seek' ? 'empresas' : 'candidatos'})`,
+          label: `Quitar esta slide (dejar solo ${only === 'seek' ? 'contactar' : 'seguir'})`,
           icon: 'eyeOff',
           onSelect: change('cta.mode', only === 'seek' ? 'offer' : 'seek'),
         },
@@ -95,7 +95,7 @@ export function buildSlideMenu({ target, store, panels, preview, actions, toast 
     }
     if (mode === 'seek' || mode === 'offer') {
       items.push({
-        label: mode === 'seek' ? 'Añadir el mensaje para empresas' : 'Añadir el mensaje para candidatos',
+        label: mode === 'seek' ? 'Añadir el mensaje para contactar' : 'Añadir el mensaje para seguir',
         icon: 'plus',
         onSelect: change('cta.mode', 'both'),
       });

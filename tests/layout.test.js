@@ -65,6 +65,28 @@ describe('buildPostPages', () => {
     expect(long[0].size).toBe(24);
     expect(long[0].more).toBe(true);
   });
+  it('modo automático con imagen: la imagen se encoge antes de recortar el texto', () => {
+    const para = 'palabra '.repeat(12).trim(); // ~100 caracteres: 2 líneas
+    const text = [para, para, para].join('\n\n');
+    const withImage = { media: { type: 'image', items: ['x'] }, post: { fit: 'auto', text } };
+    const rc = rcFor(withImage);
+    const G = postGeometry(rc);
+    const [p] = buildPostPages(rc, G);
+    expect(p.more).toBe(false);
+    expect(p.mediaH).toBeGreaterThan(0);
+    expect(p.mediaH).toBeLessThan(G.maxH * 0.5);
+    // Con menos texto la imagen conserva su tamaño habitual (la mitad de la altura útil).
+    const [short] = pagesFor({ ...withImage, post: { fit: 'auto', text: 'Hola' } });
+    expect(short.mediaH).toBeCloseTo(G.maxH * 0.5);
+  });
+  it('modo automático con imagen: si ni encogiéndola cabe, se recorta con "… más"', () => {
+    const para = 'palabra '.repeat(40).trim();
+    const [p] = pagesFor({
+      media: { type: 'image', items: ['x'] },
+      post: { fit: 'auto', text: Array(8).fill(para).join('\n\n') },
+    });
+    expect(p.more).toBe(true);
+  });
   it('modo fijo: corta con "… más" en el número de líneas pedido', () => {
     const [p] = pagesFor({ post: { fit: 'manual', more: true, moreLines: 4, text: LONG } });
     expect(p.lines).toHaveLength(4);

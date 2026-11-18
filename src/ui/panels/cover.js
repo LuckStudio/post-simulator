@@ -1,13 +1,13 @@
 import { readImage } from '../../io/images.js';
 import { h } from '../dom.js';
 
-/** Pestaña "Portada": diseño e información del puesto. */
+/** Pestaña "Portada": una primera slide opcional con título, subtítulo y detalles. */
 export function coverPanel({ store, f }) {
   const C = store.state.cover;
   return [
     f.group(
       'Mostrar portada',
-      'La primera slide: presenta el puesto que se busca.',
+      'Una primera slide opcional: título, subtítulo y algunos datos de la publicación.',
       f.toggle('Incluir portada', 'cover.on', { rebuild: true }),
     ),
     C.on && [
@@ -37,12 +37,12 @@ export function coverPanel({ store, f }) {
         'Contenido',
         null,
         f.text('Etiqueta', 'cover.kicker'),
-        f.text('Puesto', 'cover.role', { area: true, rows: 2 }),
-        f.text('Empresa', 'cover.company'),
-        f.text('Ubicación', 'cover.location'),
-        f.text('Modalidad', 'cover.modality'),
-        f.text('Jornada o contrato', 'cover.contract'),
-        f.text('Salario', 'cover.salary', { ph: 'Déjalo vacío para ocultarlo' }),
+        f.text('Título', 'cover.role', { area: true, rows: 2 }),
+        f.text('Subtítulo', 'cover.company'),
+        f.text('Lugar o enlace', 'cover.location', { ph: 'Déjalo vacío para ocultarlo' }),
+        f.text('Formato', 'cover.modality', { ph: 'Déjalo vacío para ocultarlo' }),
+        f.text('Categoría', 'cover.contract', { ph: 'Déjalo vacío para ocultarlo' }),
+        f.text('Dato clave', 'cover.salary', { ph: 'Déjalo vacío para ocultarlo' }),
         f.toggle('Autor en el pie', 'cover.showAuthor'),
         f.text('Invitación a deslizar', 'cover.swipe'),
       ),

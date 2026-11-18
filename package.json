@@ -1,8 +1,8 @@
 {
-  "name": "estudio-carruseles",
-  "version": "0.2.0",
+  "name": "post-simulator",
+  "version": "0.3.0",
   "private": true,
-  "description": "Estudio de carruseles de Instagram con estética de post profesional para ofertas de empleo.",
+  "description": "Post Simulator: simula cómo se verá una publicación (texto, imágenes, vídeo, documentos y carruseles) antes de subirla.",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -1,6 +1,9 @@
 import { hasMedia, mediaNaturalHeight } from './media.js';
 import { trimBlank, truncateMore, wrapText } from './text.js';
 
+/** Parte de la altura útil que puede ocupar la multimedia en el modo automático, de más a menos. */
+const AUTO_MEDIA_SHARES = [0.5, 0.4, 0.3];
+
 /** Interlineado del texto del post, relativo al tamaño de letra. */
 export const POST_LINE_HEIGHT = 1.42;
 
@@ -89,15 +92,21 @@ export function buildPostPages(rc, G) {
   };
 
   if (P.fit === 'auto') {
-    const mH = mi ? Math.min(mi, G.maxH * 0.5) : 0;
-    for (let size = P.autoMax; size >= P.autoMin; size -= 1) {
-      const lh = size * POST_LINE_HEIGHT;
-      const lines = trimBlank(wrapText(rc, P.text, G.innerW, size * S, 400, true));
-      if (stackPost(G, { header: 1, nLines: lines.length, lh: lh * S, mediaH: mH, footer: 1 }).h <= G.maxH) {
-        return [{ header: true, lines, size, mediaH: mH, footer: true, more: false }];
+    // Se busca el mayor tamaño de letra que cabe con la multimedia a su tamaño habitual (hasta la
+    // mitad de la slide). Si ni siquiera el tamaño mínimo cabe, la multimedia se encoge (hasta el
+    // 30 %) antes de recortar el texto. Sin multimedia solo hay un intento.
+    const shares = mi ? AUTO_MEDIA_SHARES : [AUTO_MEDIA_SHARES[0]];
+    for (const share of shares) {
+      const mH = mi ? Math.min(mi, G.maxH * share) : 0;
+      for (let size = P.autoMax; size >= P.autoMin; size -= 1) {
+        const lh = size * POST_LINE_HEIGHT;
+        const lines = trimBlank(wrapText(rc, P.text, G.innerW, size * S, 400, true));
+        if (stackPost(G, { header: 1, nLines: lines.length, lh: lh * S, mediaH: mH, footer: 1 }).h <= G.maxH) {
+          return [{ header: true, lines, size, mediaH: mH, footer: true, more: false }];
+        }
       }
     }
-    return [singlePage(P.autoMin, mH, true)];
+    return [singlePage(P.autoMin, mi ? Math.min(mi, G.maxH * shares[shares.length - 1]) : 0, true)];
   }
 
   if (P.fit === 'manual') {

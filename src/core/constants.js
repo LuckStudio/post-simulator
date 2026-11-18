@@ -1,4 +1,9 @@
-/** Identificadores de la aplicación y de persistencia. */
+/**
+ * Identificadores de la aplicación y de persistencia.
+ * Conservan el nombre anterior ("carrusel-ofertas") a propósito: cambiarlos haría que quien ya
+ * usa la herramienta perdiera su proyecto, sus presets y sus ajustes, y que los archivos JSON
+ * exportados antes dejaran de reconocerse al importarlos.
+ */
 export const APP_ID = 'carrusel-ofertas';
 export const STORAGE_KEY = 'carrusel-ofertas-v1';
 export const PRESETS_KEY = 'carrusel-ofertas-presets-v1';

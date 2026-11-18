@@ -23,4 +23,7 @@
   El render recibe todo por el contexto `rc`; nada de variables globales.
 - El estado debe seguir siendo JSON serializable. Campos nuevos → `DEFAULT_STATE`.
 - No modificar `legacy/carrusel-ofertas.html`: es la referencia.
+- Las claves de almacenamiento y `APP_ID` (`carrusel-ofertas…`) conservan el nombre antiguo a propósito: no
+  renombrarlas (se perderían los datos de los usuarios y los archivos exportados dejarían de reconocerse).
+- Todo contenido de ejemplo es ficticio y genérico: sin nombres de marcas, personas ni empresas que puedan existir.
 - Dependencias externas en runtime: solo JSZip (empaquetado) y pdf.js (cdnjs, bajo demanda).

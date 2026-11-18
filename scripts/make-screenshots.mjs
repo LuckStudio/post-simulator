@@ -49,17 +49,25 @@ const PREFS = {
   ],
 };
 
+// Proyecto de muestra: el de ejemplo (publicación con imagen) más una portada y un cierre, para que
+// se vean las tres slides de un carrusel. El resto de valores salen de los estándar de la herramienta.
+const SHOWCASE = { v: 3, cover: { on: true }, cta: { on: true } };
+
 const browser = await chromium.launch();
 
 async function openApp({ width = 1440, height = 900, scale = 2 } = {}) {
   const ctx = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: scale, colorScheme: 'light' });
   const page = await ctx.newPage();
-  await page.addInitScript((prefs) => {
-    if (sessionStorage.getItem('preparado')) return;
-    sessionStorage.setItem('preparado', '1');
-    localStorage.clear();
-    localStorage.setItem('carrusel-ofertas-prefs-v1', JSON.stringify(prefs));
-  }, PREFS);
+  await page.addInitScript(
+    ([prefs, project]) => {
+      if (sessionStorage.getItem('preparado')) return;
+      sessionStorage.setItem('preparado', '1');
+      localStorage.clear();
+      localStorage.setItem('carrusel-ofertas-prefs-v1', JSON.stringify(prefs));
+      localStorage.setItem('carrusel-ofertas-v1', JSON.stringify(project));
+    },
+    [PREFS, SHOWCASE],
+  );
   await page.goto(APP);
   await page.waitForTimeout(900);
   return { ctx, page };
@@ -74,6 +82,7 @@ const tab = (page, label) => page.click(`.rail-btn:has-text("${label}")`);
 // ---------- Capturas del README ----------
 {
   const { ctx, page } = await openApp();
+  await page.click('#film button:nth-child(2)'); // la slide del post
   await shot(page, 'editor.png');
 
   // Menú contextual sobre el post
@@ -100,7 +109,7 @@ const tab = (page, label) => page.click(`.rail-btn:has-text("${label}")`);
 
   // Presets: dos guardados, uno marcado como inicial
   await tab(page, 'Presets');
-  for (const name of ['Estudio Norte · estándar', 'Estudio Norte · campaña verano']) {
+  for (const name of ['Mi marca · estándar', 'Mi marca · versión oscura']) {
     await page.fill('#preset-name', name);
     await page.click('#panel >> text=Guardar preset');
     await page.waitForTimeout(250);
@@ -188,9 +197,9 @@ for (const [name, width, height] of [
     .slide{position:absolute;border-radius:12px;box-shadow:0 24px 60px rgba(15,35,70,.22)}
   </style>
   <div class="left">
-    <div class="brand">${icon}<span>ESTUDIO DE CARRUSELES</span></div>
-    <h1>Tus ofertas de empleo, en carruseles que se ven profesionales</h1>
-    <p>Escribe la oferta y sale lista para Instagram: portada, post y cierre. En imagen o vídeo animado.</p>
+    <div class="brand">${icon}<span>POST SIMULATOR</span></div>
+    <h1>Simula cómo se verá tu publicación antes de subirla</h1>
+    <p>Texto, imágenes, vídeo, documentos y carruseles con estética de post profesional. Expórtalo en imagen o en vídeo animado.</p>
     <div class="chips"><b>Gratis</b><b>Sin registro</b><b>Funciona sin conexión</b></div>
   </div>
   <img class="slide" src="${cta}"   style="left:930px;top:120px;width:300px;transform:rotate(7deg);opacity:.96">

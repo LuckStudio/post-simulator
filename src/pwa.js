@@ -60,7 +60,7 @@ export async function storageStatus() {
   let offlineReady = false;
   try {
     const keys = (await window.caches?.keys?.()) ?? [];
-    offlineReady = keys.some((k) => k.startsWith('estudio-carruseles-'));
+    offlineReady = keys.some((k) => k.startsWith('post-simulator-'));
   } catch {
     /* idem */
   }

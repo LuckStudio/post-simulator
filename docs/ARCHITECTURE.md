@@ -139,7 +139,7 @@ forma nueva de ver la herramienta**: una entrada en `UI_SETTINGS` y su CSS; la p
   maquetado de texto y reparto en slides. En Node se usa un medidor de texto falso
   (`tests/helpers.js`), así el maquetado es determinista.
 - `npm run check:legacy`: compara píxel a píxel la build con la versión original
-  (`legacy/carrusel-ofertas.html`) en 11 proyectos estáticos y 6 animados. Es la red de
+  (`legacy/carrusel-ofertas.html`) en 11 proyectos estáticos y 7 animados, con los valores por defecto del propio original. Es la red de
   seguridad para refactors; cuando haya cambios visuales intencionados, conviene sustituirlo
   por capturas de referencia propias.
 - `npm run lint` / `npm run format`: ESLint y Prettier.

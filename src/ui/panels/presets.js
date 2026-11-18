@@ -18,7 +18,7 @@ export function presetsPanel({ f, actions }) {
     type: 'text',
     id: 'preset-name',
     maxlength: 60,
-    placeholder: 'Ej.: Estudio Norte · estilo estándar',
+    placeholder: 'Ej.: Mi marca · estilo estándar',
     value: draft.name,
   });
   nameInput.addEventListener('input', () => (draft.name = nameInput.value));
@@ -41,7 +41,7 @@ export function presetsPanel({ f, actions }) {
 
   const saveGroup = f.group(
     'Guardar los ajustes actuales',
-    'Un preset recuerda cómo se ve tu carrusel, no el texto de la oferta, para reutilizarlo con un clic.',
+    'Un preset recuerda cómo se ve tu publicación, no su texto ni sus imágenes, para reutilizarlo con un clic.',
     h('div', { class: 'field' }, h('label', { for: 'preset-name' }, 'Nombre'), nameInput),
     h('div', { class: 'field' }, h('span', { class: 'lbl' }, 'Qué incluir'), h('div', { class: 'checks' }, checks)),
     h(

@@ -12,7 +12,7 @@ const CTA_SETS = {
 };
 
 /**
- * Slides de cierre: "síguenos si buscas trabajo" y/o "escríbenos si ofreces un puesto".
+ * Slides de cierre: invitar a seguir la cuenta ("seek") y/o a contactar ("offer").
  * Devuelve una o dos slides.
  */
 export function ctaSlides(rc, G) {

@@ -136,7 +136,7 @@ function fontGroup({ store, f, actions, prefs }) {
     h(
       'p',
       { class: 'font-sample', style: `font-family: ${fontFamily(current)}`, 'aria-hidden': 'true' },
-      'Aa · Diseñador/a de Producto Senior',
+      'Aa · Texto de ejemplo de tu publicación',
     ),
     f.button('Buscar fuentes instaladas', () => actions.detectFonts(), { cls: 'btn' }),
     h(

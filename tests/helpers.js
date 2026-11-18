@@ -24,5 +24,7 @@ export const fakeAssets = () => ({ video: null, image: () => null });
 
 /** Contexto de render para un estado por defecto con `patch` aplicado. */
 export function rcFor(patch = {}) {
-  return createRenderContext(deepMerge(createDefaultState(), patch), fakeAssets());
+  // El proyecto de ejemplo lleva una imagen; los tests de maquetado parten de una publicación sin multimedia.
+  const base = deepMerge(createDefaultState(), { media: { type: 'none', items: [] } });
+  return createRenderContext(deepMerge(base, patch), fakeAssets());
 }

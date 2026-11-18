@@ -29,6 +29,7 @@ function loadPlaywright() {
 const { chromium } = loadPlaywright();
 const { PRESETS } = await import('../src/animation/presets.js');
 const { deepMerge } = await import('../src/state/store.js');
+const { SCHEMA_VERSION } = await import('../src/state/defaults.js');
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const LEGACY = pathToFileURL(path.join(root, 'legacy/carrusel-ofertas.html')).href;
@@ -48,18 +49,19 @@ const LONG_TEXT = Array.from(
 /** Variantes: parches parciales sobre el proyecto por defecto. */
 /**
  * Los valores estándar de la herramienta han cambiado a propósito desde la versión original
- * (avatar redondo, ajuste automático, degradado, sombra de 50 px…). Para comparar el *dibujo*
- * y no los valores por defecto, ambos programas reciben aquí los valores antiguos de forma
- * explícita. `v: 2` evita que la migración de la build nueva los vuelva a cambiar.
+ * (contenido de ejemplo, avatar redondo, ajuste automático, degradado, sombra de 50 px…). Para
+ * comparar el *dibujo* y no los valores por defecto, ambos programas reciben aquí los valores por
+ * defecto del propio original (se leen de la página `legacy/`). Con `v` igual a la versión actual
+ * del esquema, la migración de la build nueva no los vuelve a cambiar.
  */
-const LEGACY_BASE = {
-  v: 2,
-  author: { shape: 'square' },
-  post: { fit: 'split' },
-  stats: { types: ['like', 'love', 'star'] },
-  style: { bgMode: 'theme', bg: '#F4F2EE', bg2: '#DCE4EE', shadowBlur: 44 },
-  anim: { preset: 'suave', order: 'cascada', ease: 'outCubic' },
-};
+let LEGACY_BASE = null;
+async function loadLegacyBase(browser) {
+  const page = await browser.newPage();
+  await page.goto(LEGACY);
+  const legacyDefault = await page.evaluate(() => JSON.parse(JSON.stringify(DEFAULT))); // eslint-disable-line no-undef
+  await page.close();
+  return { ...legacyDefault, v: SCHEMA_VERSION, style: { ...legacyDefault.style, shadowBlur: 44 } };
+}
 
 const VARIANTS = {
   'por defecto': {},
@@ -175,6 +177,7 @@ async function diff(browser, a, b) {
 }
 
 const browser = await chromium.launch();
+LEGACY_BASE = await loadLegacyBase(browser);
 let failures = 0;
 
 const jobs = [

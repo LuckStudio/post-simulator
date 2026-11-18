@@ -1,5 +1,6 @@
 import { clone } from '../core/utils.js';
 import { PRESETS } from '../animation/presets.js';
+import { PLACEHOLDER_IMAGE } from './placeholder.js';
 
 /**
  * Esquema del proyecto. Todo es serializable a JSON: es lo que se guarda en
@@ -12,31 +13,35 @@ import { PRESETS } from '../animation/presets.js';
  * @property {object} post              Texto y modo de ajuste: fit = 'split' | 'auto' | 'manual'.
  * @property {object} media             type = 'none' | 'image' | 'grid' | 'video' | 'document'; items = dataURLs.
  * @property {object} stats             Reacciones, comentarios, botones.
- * @property {object} cover             Portada con los datos del puesto.
- * @property {object} cta               Cierre; mode = 'both' | 'separate' | 'seek' | 'offer'.
+ * @property {object} cover             Portada opcional: etiqueta, título, subtítulo y detalles.
+ * @property {object} cta               Cierre opcional; mode = 'both' | 'separate' | 'seek' (seguir) | 'offer' (contactar).
  * @property {object} style             Tema, fondo, tipografía, tarjeta y márgenes.
  * @property {object} anim              Preset, ritmo y animación por elemento (el).
  */
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
+
+/** Texto de la publicación de ejemplo: ficticio y sin referencias a nada real. */
+export const DEMO_TEXT =
+  'Este es un texto de ejemplo para simular cómo se verá tu publicación. Cámbialo por el mensaje que quieras probar.\n\nPuedes añadir #etiquetas y mencionar a @alguien: se colorean como en un post real.';
 
 /** @type {ProjectState} */
 export const DEFAULT_STATE = {
   v: SCHEMA_VERSION,
   format: '4:5',
   author: {
-    name: 'Estudio Norte',
-    headline: 'Estudio de diseño digital en Madrid',
+    name: 'Nombre de la marca',
+    headline: 'Descripción de la cuenta',
     time: '2 h',
     globe: true,
     avatar: null,
     shape: 'circle',
-    initials: 'EN',
-    avatarColor: '#2E5E4E',
+    initials: 'NM',
+    avatarColor: '#5B7A99',
     follow: true,
   },
   post: {
-    text: '¡Seguimos creciendo! 🚀\n\nBuscamos un/a Diseñador/a de Producto Senior que quiera liderar la experiencia de nuestras apps para clientes de retail y cultura.\n\nQué harás:\n→ Diseñar flujos completos, del research al prototipo.\n→ Trabajar codo con codo con desarrollo y negocio.\n→ Definir y mantener nuestro sistema de diseño.\n\nQué buscamos:\n→ 5 años o más diseñando producto digital.\n→ Dominio de Figma y prototipado.\n→ Ganas de explicar el porqué de cada decisión.\n\nOfrecemos modelo híbrido en Madrid, horario flexible y presupuesto anual de formación.\n\n¿Te interesa o conoces a alguien? Escríbenos o comparte este post 👇\n\n#empleo #diseño #UX #producto #Madrid',
+    text: DEMO_TEXT,
     fit: 'auto',
     size: 34,
     autoMin: 24,
@@ -48,13 +53,13 @@ export const DEFAULT_STATE = {
     hashtags: true,
   },
   media: {
-    type: 'none',
+    type: 'image',
     aspect: 'auto',
-    items: [],
+    items: [PLACEHOLDER_IMAGE],
     zoom: 1,
     fx: 0.5,
     fy: 0.5,
-    docTitle: 'Descripción del puesto',
+    docTitle: 'Documento de ejemplo',
     docPage: 0,
     docAuto: true,
     videoTime: 0,
@@ -70,29 +75,29 @@ export const DEFAULT_STATE = {
     labels: ['Recomendar', 'Comentar', 'Compartir', 'Enviar'],
   },
   cover: {
-    on: true,
+    on: false,
     layout: 'card',
     image: null,
     overlay: 0.55,
-    kicker: 'Estamos contratando',
-    role: 'Diseñador/a de Producto Senior',
-    company: 'Estudio Norte',
-    location: 'Madrid',
-    modality: 'Híbrido, 3 días en oficina',
-    contract: 'Jornada completa',
-    salary: '45.000 – 55.000 € brutos/año',
+    kicker: 'Etiqueta destacada',
+    role: 'Título principal de la publicación',
+    company: 'Subtítulo o nombre de la marca',
+    location: 'Lugar o enlace de ejemplo',
+    modality: 'Formato de ejemplo',
+    contract: 'Categoría de ejemplo',
+    salary: 'Dato clave de ejemplo',
     showAuthor: true,
-    swipe: 'Desliza para ver la oferta',
+    swipe: 'Desliza para ver más',
   },
   cta: {
-    on: true,
+    on: false,
     mode: 'both',
-    handle: '@estudionorte',
-    seekTitle: '¿Buscas trabajo?',
-    seekText: 'Síguenos y te avisamos de cada nueva oferta que publiquemos.',
+    handle: '@tumarca',
+    seekTitle: '¿Quieres ver más?',
+    seekText: 'Síguenos para no perderte las próximas publicaciones.',
     seekBtn: 'Seguir',
-    offerTitle: '¿Tienes una vacante?',
-    offerText: 'Escríbenos y la compartimos con nuestra comunidad.',
+    offerTitle: '¿Quieres contactar?',
+    offerText: 'Escríbenos y lo hablamos por mensaje directo.',
     offerBtn: 'Enviar mensaje',
   },
   style: {

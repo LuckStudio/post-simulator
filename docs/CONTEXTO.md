@@ -1,8 +1,8 @@
-# Contexto: Estudio de carruseles de ofertas de empleo
+# Contexto: Post Simulator
 
 ## Qué es
 
-Herramienta web (un único HTML) para crear **carruseles de Instagram con estética de post de LinkedIn**, pensada para publicar **ofertas de empleo**. El texto del post se convierte en imagen. También sirve para previsualizar posts antes de publicarlos.
+Herramienta web (un único HTML) para **simular cómo se verá una publicación con estética de post profesional** (tipo LinkedIn) antes de subirla: texto, imágenes, vídeo, documentos y carruseles. El resultado se exporta como imagen o vídeo. Nació como un generador de carruseles de ofertas de empleo; la oferta de empleo pasará a ser una plantilla más (ver `Brief de ampliación` y las fases abajo).
 
 - Artifact publicado: https://claude.ai/artifact/3aHfaHP52uj9Pi2FCmEtu9
 - Código fuente: módulos en `src/` (ver `docs/ARCHITECTURE.md`). `npm run build` genera
@@ -12,9 +12,9 @@ Herramienta web (un único HTML) para crear **carruseles de Instagram con estét
 ## Brief acordado
 
 - **Estructura del carrusel**:
-  - **Portada** con el puesto: etiqueta, rol, empresa, ubicación, modalidad, contrato, salario, autor y "desliza".
+  - **Portada** opcional: etiqueta, título, subtítulo, cuatro detalles con icono (lugar, formato, categoría, dato clave), autor y "desliza".
   - **Post**: una o varias slides.
-  - **Cierre** con CTA: "síguenos si buscas trabajo" y "escríbenos si ofreces un puesto". Pueden ir juntos en una slide, en dos slides o solo uno de los dos.
+  - **Cierre** opcional con dos mensajes: invitar a seguir la cuenta y/o a contactar. Pueden ir juntos en una slide, en dos slides o solo uno de los dos.
 - **Identidad visual**: minimalista, parecida a LinkedIn pero **sin logos ni iconos propietarios**. Iconos y reacciones son diseños propios.
 - **Proporciones**: 4:5 (por defecto, 1080×1350), 1:1, 3:4, 9:16 y 16:9. El diseño se recoloca solo.
 - **Texto largo**: tres modos a elegir en cada momento:
@@ -80,6 +80,17 @@ Herramienta web (un único HTML) para crear **carruseles de Instagram con estét
   - Corregido: el estado del almacenamiento mostraba `[object HTMLBRElement]` cuando el navegador
     informaba del espacio usado.
 
+- **v0.6 — Post Simulator (fase 1 del brief de ampliación).**
+  - Nuevo nombre y enfoque genérico: el estándar es una **publicación libre** (una slide con imagen), sin
+    portada ni cierre; añadirlos es opcional.
+  - Contenido de ejemplo ficticio y sin referencias a nada real ("Nombre de la marca", "@tumarca"…),
+    imagen de ejemplo generada, etiquetas de la portada y el cierre sin lenguaje de empleo.
+  - Los proyectos guardados con el ejemplo antiguo sin tocar pasan al nuevo; los que ya tienen contenido
+    propio no cambian (migración v2 → v3).
+  - Modo automático con imagen: la imagen se encoge (hasta el 30 % de la slide) antes de recortar el texto.
+  - Las claves de almacenamiento conservan el nombre anterior (`carrusel-ofertas-…`) para no perder los
+    datos de quien ya usa la herramienta.
+
 ## Limitaciones conocidas
 
 - El vídeo subido dentro del post no se guarda en JSON ni en HTML; hay que resubirlo al importar.
@@ -93,5 +104,5 @@ Herramienta web (un único HTML) para crear **carruseles de Instagram con estét
 ## Próximos pasos propuestos
 
 - Plantillas guardadas por cliente.
-- Duplicar un carrusel para otra oferta.
+- Duplicar un proyecto para otra publicación.
 - Portada con foto de equipo.
