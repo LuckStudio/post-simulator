@@ -13,6 +13,7 @@ import { $, h } from './ui/dom.js';
 import { createRecorderDialog, toast } from './ui/feedback.js';
 import { createFields } from './ui/fields.js';
 import { createPanelHost } from './ui/panels/index.js';
+import { mountStaticIcons } from './ui/icons.js';
 import { createPreview } from './ui/preview.js';
 
 /**
@@ -169,6 +170,8 @@ export function startApp() {
     e.target.value = '';
   };
 
+  mountStaticIcons();
+  $('#exportGo').onclick = () => panels.select('export', { reveal: true });
   panels.renderTabs();
   panels.render();
   actions.renderFormatSwitch();

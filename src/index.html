@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Estudio de carruseles de ofertas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app">
+      <nav class="rail" aria-label="Secciones">
+        <div class="rail-brand" title="Estudio de carruseles" data-icon="brand" data-icon-size="22"></div>
+        <div class="rail-tabs" id="tabs"></div>
+      </nav>
+
+      <aside class="panel" aria-label="Ajustes de la sección">
+        <header class="panel-head">
+          <h2 id="panelTitle">Post</h2>
+        </header>
+        <div class="panel-body" id="panel"></div>
+      </aside>
+
+      <main class="main" aria-label="Vista previa">
+        <h1 class="sr">Estudio de carruseles de ofertas de empleo</h1>
+        <div class="toolbar">
+          <div class="seg" id="fmtTop" role="group" aria-label="Proporción"></div>
+          <div class="seg" id="modeSeg" role="group" aria-label="Modo de vista">
+            <button type="button" data-mode="static" aria-pressed="true">Estático</button>
+            <button type="button" data-mode="anim" aria-pressed="false">Animado</button>
+          </div>
+          <button class="btn" id="playBtn" type="button" hidden>Pausar</button>
+          <button class="btn" id="replayBtn" type="button" hidden>Repetir</button>
+          <label class="btn" id="allWrap" hidden><input type="checkbox" id="playAll" /> Todo el carrusel</label>
+          <div class="spacer"></div>
+          <button class="btn primary" id="exportGo" type="button">Exportar</button>
+        </div>
+
+        <div class="canvas-wrap" id="cwrap">
+          <canvas id="preview" width="1080" height="1350" aria-label="Vista previa de la slide"></canvas>
+        </div>
+
+        <div class="dock">
+          <div class="nav-row">
+            <button
+              class="btn icon"
+              id="prevBtn"
+              type="button"
+              aria-label="Slide anterior"
+              data-icon="prev"
+              data-icon-size="20"
+            ></button>
+            <span class="count" id="count" aria-live="polite">—</span>
+            <button
+              class="btn icon"
+              id="nextBtn"
+              type="button"
+              aria-label="Slide siguiente"
+              data-icon="next"
+              data-icon-size="20"
+            ></button>
+          </div>
+          <div class="film" id="film" aria-label="Slides del carrusel"></div>
+        </div>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status"></div>
+    <div class="modal" id="recModal" role="dialog" aria-modal="true" aria-labelledby="recTitle">
+      <div class="box">
+        <h4 id="recTitle">Grabando vídeo</h4>
+        <p id="recText">Mantén esta pestaña visible hasta que termine.</p>
+        <div class="bar"><i id="recBar"></i></div>
+        <button class="btn" id="recCancel" type="button">Cancelar</button>
+      </div>
+    </div>
+    <input type="file" id="importInput" accept=".json,.html,application/json,text/html" class="sr" tabindex="-1" />
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

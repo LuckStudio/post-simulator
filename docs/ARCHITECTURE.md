@@ -3,6 +3,7 @@
 La herramienta es una aplicación web sin backend. El código fuente está dividido en
 módulos ES y Vite lo empaqueta en **un único `dist/index.html`** autocontenido (JS y
 CSS en línea), que se publica como artifact o se abre directamente en el navegador.
+`npm run build` lo copia además a `/index.html`: GitHub Pages sirve la rama `main` tal cual.
 
 ## Principio central
 

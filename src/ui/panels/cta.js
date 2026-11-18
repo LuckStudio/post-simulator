@@ -3,7 +3,7 @@ export function ctaPanel({ store, f }) {
   const C = store.state.cta;
   return [
     f.group(
-      'Cierre',
+      'Mostrar cierre',
       'La última slide invita a seguir la cuenta o a escribir.',
       f.toggle('Incluir cierre', 'cta.on', { rebuild: true }),
     ),

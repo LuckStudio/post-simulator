@@ -53,6 +53,13 @@ Herramienta web (un único HTML) para crear **carruseles de Instagram con estét
   Se corrigió un fallo del original: las pestañas **Portada** y **Cierre** mostraban
   `[object HTMLElement]` en lugar de sus campos cuando estaban activadas.
 
+- **v0.3 — interfaz de barra lateral de iconos** (propuesta 8 de las 10 estudiadas).
+  Barra de iconos + panel de ajustes + vista previa clara con barra de herramientas
+  (proporción, estático/animado, Exportar) y miniaturas; acento azul como en la red social;
+  en móvil la barra pasa abajo y el panel queda bajo la vista previa. El render de las slides
+  no cambia (sigue idéntico al original). Se corrigió la publicación: GitHub Pages servía
+  el HTML de desarrollo y ahora sirve la build de la raíz.
+
 ## Limitaciones conocidas
 
 - El vídeo subido dentro del post no se guarda en JSON ni en HTML; hay que resubirlo al importar.

@@ -6,7 +6,7 @@ export function coverPanel({ store, f }) {
   const C = store.state.cover;
   return [
     f.group(
-      'Portada',
+      'Mostrar portada',
       'La primera slide: presenta el puesto que se busca.',
       f.toggle('Incluir portada', 'cover.on', { rebuild: true }),
     ),
