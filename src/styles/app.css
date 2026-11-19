@@ -1699,3 +1699,56 @@ input[type='color'] {
     flex: 1;
   }
 }
+
+/* Hoja «Nuevo proyecto»: plantillas */
+.tpl-wrap {
+  padding: 4px 20px 8px;
+}
+.tpl-wrap .hint {
+  margin: 0 0 12px;
+}
+.tpl-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.tpl {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.tpl:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.tpl-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.tpl-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.tpl-text span {
+  color: var(--muted);
+  font-size: 13px;
+}

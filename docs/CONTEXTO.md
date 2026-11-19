@@ -123,3 +123,9 @@ Herramienta web (un único HTML) para **simular cómo se verá una publicación 
   «Inicio» en el editor y el botón «atrás» del móvil devuelven a ella. Ajuste nuevo en Configuración,
   «Al abrir la herramienta»: pantalla de inicio (por defecto) o seguir editando. Los proyectos nuevos
   son vacíos; las plantillas y el modo paso a paso llegan en las fases 5 y 6.
+- **v0.10 — crear nuevo y plantillas (fase 5 del brief de ampliación).** «Nuevo proyecto» abre una hoja con
+  cinco puntos de partida: publicación libre, oferta de empleo, evento, novedad o lanzamiento y guía en
+  slides. Cada plantilla es un parche de contenido (texto de ejemplo ficticio, portada y cierre) sobre el
+  estado inicial, así que respeta el preset marcado como inicial. El nombre del proyecto sale de la
+  plantilla y se numera si ya existe. El modo «paso a paso» (elegir entre guiado y desde cero) llega en la
+  fase 6: hoy todas las plantillas se abren en el editor normal.

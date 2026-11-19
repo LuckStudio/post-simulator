@@ -2,6 +2,8 @@ import { timeAgo } from '../core/time.js';
 import { $, h } from './dom.js';
 import { svgIcon } from './icons.js';
 import { overlays } from './overlays.js';
+import { openSheet } from './sheet.js';
+import { TEMPLATES, stateFromTemplate } from '../state/templates.js';
 
 const BRAND_ICON = './favicon.svg';
 
@@ -14,8 +16,9 @@ const BRAND_ICON = './favicon.svg';
  * @param {object} o.projects  `actions.projects`: list, open, create, duplicate, rename, remove, exportJson, flush, currentId
  * @param {object} o.menu      menú contextual (createContextMenu)
  * @param {()=>void} o.onImport  abre el selector de archivos para importar
+ * @param {()=>object} o.makeInitial  estado inicial de un proyecto (valores estándar o preset inicial)
  */
-export function createHome({ projects, menu, onImport }) {
+export function createHome({ projects, menu, onImport, makeInitial }) {
   const root = $('#home');
   const html = document.documentElement;
   let seq = 0; // descarta respuestas de listados antiguos si hay varios seguidos
@@ -50,9 +53,47 @@ export function createHome({ projects, menu, onImport }) {
     enterEditor();
   }
 
-  async function create() {
-    await projects.create({ name: 'Proyecto sin título' });
+  async function createFrom(template) {
+    await projects.create({ name: template.name, state: stateFromTemplate(template.id, makeInitial()) });
     enterEditor();
+  }
+
+  /** «Nuevo proyecto»: hoja con las plantillas para elegir el punto de partida. */
+  function chooseTemplate(opener) {
+    let sheet = null;
+    const list = h(
+      'ul',
+      { class: 'tpl-list' },
+      TEMPLATES.map((t) =>
+        h(
+          'li',
+          {},
+          h(
+            'button',
+            {
+              type: 'button',
+              class: 'tpl',
+              onclick: () => {
+                sheet.close({ restoreFocus: false });
+                createFrom(t);
+              },
+            },
+            h('span', { class: 'tpl-icon' }, svgIcon(t.icon, 24)),
+            h('span', { class: 'tpl-text' }, h('strong', {}, t.title), h('span', {}, t.desc)),
+          ),
+        ),
+      ),
+    );
+    sheet = openSheet({
+      title: 'Nuevo proyecto',
+      content: h(
+        'div',
+        { class: 'tpl-wrap' },
+        h('p', { class: 'hint' }, 'Elige un punto de partida. Todo el texto es de ejemplo: cámbialo por el tuyo.'),
+        list,
+      ),
+      opener,
+    });
   }
 
   // ---------- Acciones por proyecto ----------
@@ -145,7 +186,7 @@ export function createHome({ projects, menu, onImport }) {
     const others = list.filter((m) => m !== current);
     const newBtn = h(
       'button',
-      { type: 'button', class: 'btn primary', onclick: create },
+      { type: 'button', class: 'btn primary', onclick: (e) => chooseTemplate(e.currentTarget) },
       svgIcon('plus', 18),
       'Nuevo proyecto',
     );

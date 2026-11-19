@@ -79,7 +79,7 @@ Un carrusel de ejemplo (portada, publicación con imagen y cierre) en formato 4:
   <tr>
     <td width="50%" valign="top">
       <h3>🗂️ Tus proyectos, siempre a mano</h3>
-      <p>Cada publicación se guarda sola en tu dispositivo, vídeo incluido. Desde la pantalla de inicio sigues donde lo dejaste, abres otro proyecto, lo duplicas, lo renombras, lo descargas o lo eliminas.</p>
+      <p>Cada publicación se guarda sola en tu dispositivo, vídeo incluido. Desde la pantalla de inicio sigues donde lo dejaste, abres otro proyecto, lo duplicas, lo renombras, lo descargas o lo eliminas. Para empezar uno nuevo eliges una plantilla: publicación libre, oferta de empleo, evento, novedad o lanzamiento, o una guía en slides.</p>
       <img src="docs/img/inicio.png" alt="Pantalla de inicio con el último proyecto y otros proyectos guardados">
     </td>
     <td width="50%" valign="top" align="center">

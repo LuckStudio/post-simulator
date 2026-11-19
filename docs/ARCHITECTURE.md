@@ -137,6 +137,13 @@ Dos pantallas que alternan con `data-screen` (`home` | `editor`) en `<html>`; un
 al editor desde inicio empuja una capa en `overlays`, así «atrás» en el móvil vuelve a inicio. Sin
 biblioteca (IndexedDB no disponible) no hay inicio: `data-library="off"` oculta el botón «Inicio».
 
+### Plantillas (`state/templates.js`)
+
+`TEMPLATES` es una lista de parches de contenido; `stateFromTemplate(id, base)` los mezcla sobre `base`
+(el estado inicial: estándar o preset marcado como inicial) sin tocar estilo ni animación. Es pura y está
+probada. `home.js` las muestra en una hoja al pulsar «Nuevo proyecto». Para añadir una plantilla basta una
+entrada nueva con su parche y un icono de `UI_ICON`.
+
 ## Móvil (`ui/mobile.js` y piezas asociadas)
 
 Misma interfaz y mismos paneles que el escritorio; en pantallas de hasta 900 px solo cambia la

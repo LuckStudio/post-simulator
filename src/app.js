@@ -641,7 +641,9 @@ export function startApp({ boot = null } = {}) {
   });
 
   // Pantalla de inicio (si hay biblioteca) o directamente el editor (guardado clásico).
-  const home = projects ? createHome({ projects: projectsApi, menu, onImport: () => actions.openImport() }) : null;
+  const home = projects
+    ? createHome({ projects: projectsApi, menu, onImport: () => actions.openImport(), makeInitial: initialState })
+    : null;
   if (home) home.start();
   else {
     document.documentElement.dataset.screen = 'editor';
