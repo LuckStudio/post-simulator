@@ -14,6 +14,7 @@ export const UI_ICON = {
   export: 'M12 3v12M7 10l5 5 5-5M4 21h16',
   presets: 'M7 4h10v17l-5-4-5 4z',
   settings: 'M4 7h9M17 7h3M15 5v4M4 17h3M11 17h9M9 15v4',
+  home: 'M4 11l8-7 8 7M6 9.5V20h4v-5h4v5h4V9.5',
   prev: 'M15 6l-6 6 6 6',
   close: 'M6 6l12 12M18 6L6 18',
   share: 'M12 15V3M7 8l5-5 5 5M5 13v7h14v-7',

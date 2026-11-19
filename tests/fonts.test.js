@@ -61,7 +61,7 @@ describe('prefs', () => {
     expect(createPrefs(st).get()).toEqual({
       fontsRecent: [],
       fontsInstalled: [],
-      ui: { appearance: 'system', mobilePreview: 'top', density: 'comfortable' },
+      ui: { appearance: 'system', mobilePreview: 'top', startScreen: 'home', density: 'comfortable' },
       lastProject: null,
       legacyMigrated: false,
     });

@@ -78,6 +78,18 @@ Un carrusel de ejemplo (portada, publicación con imagen y cierre) en formato 4:
   </tr>
   <tr>
     <td width="50%" valign="top">
+      <h3>🗂️ Tus proyectos, siempre a mano</h3>
+      <p>Cada publicación se guarda sola en tu dispositivo, vídeo incluido. Desde la pantalla de inicio sigues donde lo dejaste, abres otro proyecto, lo duplicas, lo renombras, lo descargas o lo eliminas.</p>
+      <img src="docs/img/inicio.png" alt="Pantalla de inicio con el último proyecto y otros proyectos guardados">
+    </td>
+    <td width="50%" valign="top" align="center">
+      <h3>📲 Inicio en el móvil</h3>
+      <p align="left">La misma pantalla, pensada para el pulgar. Con «Atrás» del móvil vuelves del editor a tus proyectos.</p>
+      <img src="docs/img/inicio-movil.png" alt="Pantalla de inicio en un móvil" width="260">
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
       <h3>⚙️ A tu gusto</h3>
       <p>Interfaz clara, oscura o automática (como tu dispositivo) y una vista compacta que deja más sitio a la vista previa. Preparada para añadir más formas de verla.</p>
       <img src="docs/img/configuracion.png" alt="Pestaña de Configuración con la apariencia y la densidad de la interfaz">

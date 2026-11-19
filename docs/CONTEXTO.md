@@ -117,3 +117,9 @@ Herramienta web (un único HTML) para **simular cómo se verá una publicación 
   localStorage se pasa a la biblioteca una sola vez. Importar un archivo crea un proyecto nuevo en vez de
   pisar el actual. Si el navegador no permite IndexedDB, se sigue con el guardado clásico. Todavía no hay
   pantalla para gestionarlos (fase 4): la API está en `actions.projects` y en `window.carruselStudio.projects`.
+- **v0.9 — pantalla de inicio (fase 4 del brief de ampliación).** La herramienta abre en una pantalla de
+  inicio con «Seguir con…» (el último proyecto), la lista de proyectos y los botones Nuevo proyecto e
+  Importar. Cada proyecto se puede abrir, renombrar, duplicar, descargar (JSON) o eliminar. Un botón
+  «Inicio» en el editor y el botón «atrás» del móvil devuelven a ella. Ajuste nuevo en Configuración,
+  «Al abrir la herramienta»: pantalla de inicio (por defecto) o seguir editando. Los proyectos nuevos
+  son vacíos; las plantillas y el modo paso a paso llegan en las fases 5 y 6.

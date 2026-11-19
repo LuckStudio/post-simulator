@@ -37,6 +37,20 @@ export const UI_SETTINGS = {
       floating: 'Toca la vista previa para verla a pantalla completa.',
     },
   },
+  startScreen: {
+    label: 'Al abrir la herramienta',
+    hint: 'Desde la pantalla de inicio puedes seguir con tu último proyecto, abrir otro o crear uno nuevo.',
+    attr: 'start',
+    default: 'home',
+    options: {
+      home: 'Pantalla de inicio',
+      editor: 'Seguir editando',
+    },
+    optionHints: {
+      home: 'Ves tus proyectos y eliges con cuál seguir.',
+      editor: 'Entras directamente en el último proyecto.',
+    },
+  },
   density: {
     label: 'Densidad',
     hint: 'La vista compacta reduce espacios y deja más sitio a la vista previa.',

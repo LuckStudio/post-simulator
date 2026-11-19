@@ -18,7 +18,7 @@ function loadPlaywright() {
     return require(path.join(execSync('npm root -g').toString().trim(), 'playwright'));
   }
 }
-const { chromium } = loadPlaywright();
+const { chromium, devices } = loadPlaywright();
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const APP = pathToFileURL(path.join(root, 'dist/index.html')).href;
@@ -33,7 +33,7 @@ mkdirSync(SHOTS, { recursive: true });
 
 // Preferencias de ejemplo: interfaz clara y algunas tipografías ya usadas/detectadas.
 const PREFS = {
-  ui: { appearance: 'light', density: 'comfortable' },
+  ui: { appearance: 'light', density: 'comfortable', startScreen: 'editor' },
   fontsRecent: ['Montserrat', 'Georgia'],
   fontsInstalled: [
     'Arial',
@@ -130,6 +130,57 @@ const tab = (page, label) => page.click(`.rail-btn:has-text("${label}")`);
   await shot(page, 'exportar.png');
   await ctx.close();
 }
+
+// Pantalla de inicio (escritorio y móvil): varios proyectos de ejemplo, el de la muestra como «Seguir con…»
+async function inicio({ name, mobile }) {
+  const ctx = await browser.newContext({
+    ...(mobile
+      ? { ...devices['iPhone 13'], viewport: { width: 390, height: 780 } }
+      : { viewport: { width: 1180, height: 760 } }),
+    deviceScaleFactor: 2,
+    colorScheme: 'light',
+  });
+  const page = await ctx.newPage();
+  await page.addInitScript(
+    ([prefs, project]) => {
+      if (sessionStorage.getItem('preparado')) return;
+      sessionStorage.setItem('preparado', '1');
+      localStorage.clear();
+      indexedDB.deleteDatabase('post-simulator');
+      localStorage.setItem('carrusel-ofertas-prefs-v1', JSON.stringify({ ...prefs, ui: { appearance: 'light' } }));
+      localStorage.setItem('carrusel-ofertas-v1', JSON.stringify(project));
+    },
+    [PREFS, SHOWCASE],
+  );
+  await page.goto(APP);
+  await page.waitForFunction(() => window.carruselStudio);
+  await page.waitForTimeout(900);
+  await page.evaluate(async () => {
+    const api = window.carruselStudio.projects;
+    const first = api.currentId;
+    const variants = [
+      ['Cinco consejos', '1:1', true],
+      ['Novedades del trimestre', '4:5', false],
+    ];
+    for (const [name, format, cover] of variants) {
+      const st = window.carruselStudio.state;
+      st.format = format;
+      st.cover.on = cover;
+      st.cover.role = name;
+      await api.create({ name, state: st });
+      await new Promise((r) => setTimeout(r, 300));
+    }
+    await api.open(first);
+  });
+  await page.reload();
+  await page.waitForSelector('.pc.hero');
+  await page.waitForTimeout(700);
+  await page.screenshot({ path: path.join(DOCS, name) });
+  console.log('✓ docs/img/' + name);
+  await ctx.close();
+}
+await inicio({ name: 'inicio.png', mobile: false });
+await inicio({ name: 'inicio-movil.png', mobile: true });
 
 // Móvil
 {

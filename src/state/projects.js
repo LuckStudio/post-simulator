@@ -29,6 +29,18 @@ export function cleanName(name) {
     .slice(0, MAX_NAME);
 }
 
+/**
+ * Un nombre que no choque con los existentes: «Base», «Base 2», «Base 3»…
+ * Para copias: pasa «X (copia)» y se obtiene «X (copia)», «X (copia 2)»… con `suffixed`.
+ */
+export function uniqueName(base, taken, { copy = false } = {}) {
+  const used = new Set(taken.map((n) => n.toLowerCase()));
+  const make = (n) => (copy ? (n === 1 ? `${base} (copia)` : `${base} (copia ${n})`) : n === 1 ? base : `${base} ${n}`);
+  let n = 1;
+  while (used.has(make(n).toLowerCase())) n++;
+  return make(n);
+}
+
 function defaultUid() {
   if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
   return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
@@ -70,9 +82,10 @@ export function createProjects(backend, { now = Date.now, uid = defaultUid } = {
     async create({ name, state, video = null, slides, thumb }) {
       const t = now();
       const id = uid();
+      const taken = (await backend.all('meta')).map((m) => m.name);
       const meta = metaOf(
         state,
-        { id, name: cleanName(name) || defaultProjectName(state), createdAt: t, updatedAt: t },
+        { id, name: uniqueName(cleanName(name) || defaultProjectName(state), taken), createdAt: t, updatedAt: t },
         { hasVideo: !!video, ...(slides ? { slides } : {}), ...(thumb !== undefined ? { thumb } : {}) },
       );
       const ops = [
@@ -134,10 +147,11 @@ export function createProjects(backend, { now = Date.now, uid = defaultUid } = {
       if (!src) return null;
       const t = now();
       const newId = uid();
+      const taken = (await backend.all('meta')).map((m) => m.name);
       const meta = {
         ...src.meta,
         id: newId,
-        name: cleanName(name) || cleanName(`${src.meta.name} (copia)`),
+        name: cleanName(name) || uniqueName(src.meta.name, taken, { copy: true }),
         createdAt: t,
         updatedAt: t,
       };

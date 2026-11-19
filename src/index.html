@@ -60,7 +60,10 @@
           document.documentElement.dataset.theme = ui.appearance;
         if (ui.density === 'compact') document.documentElement.dataset.density = 'compact';
         if (ui.mobilePreview === 'floating') document.documentElement.dataset.preview = 'floating';
+        if (ui.startScreen === 'editor') document.documentElement.dataset.start = 'editor';
       } catch (e) {}
+      // Pantalla con la que se abre: la de inicio, salvo que se haya elegido seguir editando.
+      document.documentElement.dataset.screen = document.documentElement.dataset.start === 'editor' ? 'editor' : 'home';
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -70,6 +73,9 @@
     />
   </head>
   <body>
+    <!-- Pantalla de inicio: proyectos guardados (se rellena desde src/ui/home.js) -->
+    <section class="home" id="home" aria-label="Inicio" hidden></section>
+
     <div class="app">
       <nav class="rail" aria-label="Secciones">
         <div class="rail-brand" title="Post Simulator">
@@ -112,6 +118,15 @@
       <main class="main" aria-label="Vista previa">
         <h1 class="sr">Post Simulator</h1>
         <div class="toolbar">
+          <button
+            class="btn icon"
+            id="homeGo"
+            type="button"
+            aria-label="Inicio: tus proyectos"
+            title="Inicio"
+            data-icon="home"
+            data-icon-size="20"
+          ></button>
           <div class="seg" id="fmtTop" role="group" aria-label="Proporción"></div>
           <div class="seg" id="modeSeg" role="group" aria-label="Modo de vista">
             <button type="button" data-mode="static" aria-pressed="true">Estático</button>

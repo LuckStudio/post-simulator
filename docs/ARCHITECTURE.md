@@ -129,6 +129,14 @@ duplicar, eliminar, vídeo); `boot.js` decide con qué proyecto empezar y migra 
 sobre localStorage. Abrir un proyecto no cuenta como edición (`withoutSaving`). El vídeo se guarda con la
 clave del proyecto: no está en el estado ni en el JSON exportado.
 
+## Pantalla de inicio (`ui/home.js`)
+
+Dos pantallas que alternan con `data-screen` (`home` | `editor`) en `<html>`; un script en línea de
+`index.html` fija la inicial según el ajuste `startScreen`. `home.js` pinta la lista a partir de
+`actions.projects` (la ficha ligera: no lee las imágenes de cada proyecto) y la refresca al volver. Entrar
+al editor desde inicio empuja una capa en `overlays`, así «atrás» en el móvil vuelve a inicio. Sin
+biblioteca (IndexedDB no disponible) no hay inicio: `data-library="off"` oculta el botón «Inicio».
+
 ## Móvil (`ui/mobile.js` y piezas asociadas)
 
 Misma interfaz y mismos paneles que el escritorio; en pantallas de hasta 900 px solo cambia la

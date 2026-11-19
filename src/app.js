@@ -32,7 +32,7 @@ import { exportProjectJson, exportViewerHtml } from './export/project.js';
 import { exportVideo } from './export/video.js';
 import { canvasToBlob, projectBaseName, saveFile, slideFileName } from './io/files.js';
 import { detectInstalledFonts } from './io/fonts.js';
-import { parseProjectFile } from './io/project.js';
+import { parseProjectFile, serializeProject } from './io/project.js';
 import { createInstallPrompt, requestPersistence, storageStatus } from './pwa.js';
 import { applyUiSettings } from './ui/appearance.js';
 import { createContextMenu } from './ui/contextMenu.js';
@@ -41,6 +41,7 @@ import { createRecorderDialog, toast } from './ui/feedback.js';
 import { createFields } from './ui/fields.js';
 import { mountStaticIcons } from './ui/icons.js';
 import { createExportSheet } from './ui/exportSheet.js';
+import { createHome } from './ui/home.js';
 import { createMobileShell } from './ui/mobile.js';
 import { createPanelHost } from './ui/panels/index.js';
 import { createPreview } from './ui/preview.js';
@@ -345,6 +346,17 @@ export function startApp({ boot = null } = {}) {
       return (await projects.save(meta.id, store.state, describeProject(true))) ?? meta;
     },
 
+    /** Guarda ya lo pendiente del proyecto abierto (antes de listar o cambiar de pantalla). */
+    flush: () => projectSaver?.flush() ?? Promise.resolve(),
+
+    /** Descarga un proyecto de la biblioteca en JSON (sin el vídeo). */
+    async exportJson(id) {
+      if (!projects) return;
+      if (id === currentId) await projectSaver.flush();
+      const loaded = await projects.load(id);
+      if (loaded) await saveFile(`${slug(loaded.meta.name) || 'proyecto'}.json`, serializeProject(loaded.state), toast);
+    },
+
     async duplicate(id) {
       if (!projects) return null;
       if (id === currentId) await projectSaver.flush();
@@ -447,6 +459,7 @@ export function startApp({ boot = null } = {}) {
           // Con biblioteca, un archivo importado es un proyecto nuevo: el actual no se toca.
           const state = hydrate(data);
           await projectsApi.create({ name: defaultProjectName(state), state });
+          home?.enterEditor();
         } else {
           store.replace(data);
         }
@@ -626,6 +639,23 @@ export function startApp({ boot = null } = {}) {
     actions.ensureFontLoaded();
     preview.invalidate();
   });
+
+  // Pantalla de inicio (si hay biblioteca) o directamente el editor (guardado clásico).
+  const home = projects ? createHome({ projects: projectsApi, menu, onImport: () => actions.openImport() }) : null;
+  if (home) home.start();
+  else {
+    document.documentElement.dataset.screen = 'editor';
+    document.documentElement.dataset.library = 'off';
+  }
+
+  // Un proyecto sin miniatura (recién creado o importado) la recibe en cuanto hay tipografías cargadas.
+  if (projects && !boot.current.meta.thumb) {
+    const id = currentId;
+    document.fonts?.ready?.then(async () => {
+      if (id !== currentId) return;
+      await projects.save(id, store.state, describeProject(true)).catch(() => {});
+    });
+  }
 
   // Vídeo guardado con el proyecto abierto.
   if (boot?.current.video) actions.attachVideo(boot.current.video.blob, { persist: false });
