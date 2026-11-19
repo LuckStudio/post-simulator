@@ -27,3 +27,6 @@
   renombrarlas (se perderían los datos de los usuarios y los archivos exportados dejarían de reconocerse).
 - Todo contenido de ejemplo es ficticio y genérico: sin nombres de marcas, personas ni empresas que puedan existir.
 - Dependencias externas en runtime: solo JSZip (empaquetado) y pdf.js (cdnjs, bajo demanda).
+- Los proyectos viven en IndexedDB (`src/state/projectsDb.js`, base `post-simulator`); no renombrar la base.
+  Los scripts que arrancan la app con un proyecto en localStorage (`compare-legacy`, `make-screenshots`)
+  borran antes esa base para empezar limpios. El vídeo de un proyecto no va en el estado, sino en `blobs`.

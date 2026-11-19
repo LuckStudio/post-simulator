@@ -62,6 +62,8 @@ describe('prefs', () => {
       fontsRecent: [],
       fontsInstalled: [],
       ui: { appearance: 'system', mobilePreview: 'top', density: 'comfortable' },
+      lastProject: null,
+      legacyMigrated: false,
     });
   });
 });

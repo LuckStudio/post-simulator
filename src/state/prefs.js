@@ -4,13 +4,19 @@ import { DEFAULT_UI, normalizeUi } from '../core/uiSettings.js';
 const MAX_RECENT_FONTS = 6;
 const MAX_INSTALLED_FONTS = 800;
 
-const defaults = () => ({ fontsRecent: [], fontsInstalled: [], ui: { ...DEFAULT_UI } });
+const defaults = () => ({
+  fontsRecent: [],
+  fontsInstalled: [],
+  ui: { ...DEFAULT_UI },
+  lastProject: null,
+  legacyMigrated: false,
+});
 const cleanList = (v, max) => (Array.isArray(v) ? v.filter((x) => typeof x === 'string' && x).slice(0, max) : []);
 
 /**
  * Preferencias de este navegador que no forman parte del proyecto: ajustes de la interfaz
- * (apariencia, densidad…), tipografías recientes y la lista de fuentes instaladas ya
- * detectada. Nunca lanza.
+ * (apariencia, densidad…), tipografías recientes, la lista de fuentes instaladas ya
+ * detectada y el último proyecto abierto. Nunca lanza.
  */
 export function createPrefs(storage = globalThis.localStorage) {
   const read = () => {
@@ -20,6 +26,8 @@ export function createPrefs(storage = globalThis.localStorage) {
         fontsRecent: cleanList(raw.fontsRecent, MAX_RECENT_FONTS),
         fontsInstalled: cleanList(raw.fontsInstalled, MAX_INSTALLED_FONTS),
         ui: normalizeUi(raw.ui),
+        lastProject: typeof raw.lastProject === 'string' && raw.lastProject ? raw.lastProject : null,
+        legacyMigrated: raw.legacyMigrated === true,
       };
     } catch {
       return defaults();
@@ -51,6 +59,18 @@ export function createPrefs(storage = globalThis.localStorage) {
       p.ui = normalizeUi({ ...p.ui, ...patch });
       write(p);
       return p.ui;
+    },
+    /** Proyecto abierto por última vez (para «Seguir con…»). */
+    setLastProject(id) {
+      const p = read();
+      p.lastProject = typeof id === 'string' && id ? id : null;
+      write(p);
+    },
+    /** Marca que el proyecto antiguo de localStorage ya se pasó a la biblioteca. */
+    markLegacyMigrated() {
+      const p = read();
+      p.legacyMigrated = true;
+      write(p);
     },
     resetUi() {
       const p = read();

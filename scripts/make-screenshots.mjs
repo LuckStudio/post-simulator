@@ -63,6 +63,7 @@ async function openApp({ width = 1440, height = 900, scale = 2 } = {}) {
       if (sessionStorage.getItem('preparado')) return;
       sessionStorage.setItem('preparado', '1');
       localStorage.clear();
+      indexedDB.deleteDatabase('post-simulator');
       localStorage.setItem('carrusel-ofertas-prefs-v1', JSON.stringify(prefs));
       localStorage.setItem('carrusel-ofertas-v1', JSON.stringify(project));
     },

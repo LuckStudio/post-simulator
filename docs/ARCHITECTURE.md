@@ -118,6 +118,17 @@ opción por defecto no pone atributo. Se guardan en las preferencias del navegad
 script en línea de `src/index.html` los aplica antes de pintar para evitar parpadeos. **Para añadir una
 forma nueva de ver la herramienta**: una entrada en `UI_SETTINGS` y su CSS; la pestaña la muestra sola.
 
+## Biblioteca de proyectos (`state/projects*.js`, `boot.js`)
+
+`projectsDb.js` define el almacén (IndexedDB, o memoria en las pruebas) con tres tablas por `id`: `meta`
+(ficha ligera para listar), `data` (el estado) y `blobs` (el vídeo). `batch` es atómico, así que ficha y
+estado nunca quedan desfasados. `projects.js` aporta la lógica (crear, cargar, guardar, renombrar,
+duplicar, eliminar, vídeo); `boot.js` decide con qué proyecto empezar y migra el de localStorage;
+`autosaveProject` (en `persistence.js`) guarda con retardo en el proyecto abierto y encadena los guardados.
+`main.js` abre la biblioteca antes de `startApp({ boot })`; sin ella (`boot` nulo) se usa `autosave`
+sobre localStorage. Abrir un proyecto no cuenta como edición (`withoutSaving`). El vídeo se guarda con la
+clave del proyecto: no está en el estado ni en el JSON exportado.
+
 ## Móvil (`ui/mobile.js` y piezas asociadas)
 
 Misma interfaz y mismos paneles que el escritorio; en pantallas de hasta 900 px solo cambia la

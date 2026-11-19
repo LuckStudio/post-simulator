@@ -40,13 +40,14 @@ export function settingsPanel({ f, actions }) {
   // ----- App y datos -----
   const status = h('p', { class: 'hint' }, 'Comprobando el almacenamiento…');
   const buttons = h('div', { class: 'btn-col' });
-  actions.pwa.status().then((s) => {
+  Promise.all([actions.pwa.status(), actions.projects.list().catch(() => null)]).then(([s, list]) => {
     const yes = (b) => (b ? 'sí' : 'no');
     // Una línea por dato (replaceChildren no aplana arrays: se construye la lista ya plana).
     const lines = [
       `Datos protegidos contra borrado automático: ${yes(s.persisted)}`,
       `Disponible sin conexión: ${yes(s.offlineReady)}`,
       `Instalada como app: ${yes(s.standalone)}`,
+      actions.projects.available && list && `Proyectos guardados en este dispositivo: ${list.length}`,
       s.usage != null && `Espacio usado: ${fmtBytes(s.usage)}`,
     ].filter(Boolean);
     status.replaceChildren(...lines.flatMap((text, i) => (i ? [h('br'), h('span', {}, text)] : [h('span', {}, text)])));

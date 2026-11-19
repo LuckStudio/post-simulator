@@ -2,9 +2,10 @@ import { FORMATS } from './core/constants.js';
 import { UserError } from './core/errors.js';
 import { clone, slug } from './core/utils.js';
 import { PRESETS } from './animation/presets.js';
-import { createStore } from './state/store.js';
+import { createStore, hydrate } from './state/store.js';
 import { createDefaultState } from './state/defaults.js';
-import { autosave, loadSaved } from './state/persistence.js';
+import { autosave, autosaveProject, loadSaved } from './state/persistence.js';
+import { defaultProjectName } from './state/projects.js';
 import { createPrefs } from './state/prefs.js';
 import {
   addPreset,
@@ -72,17 +73,26 @@ function resolveVideoDuration(v) {
   });
 }
 
+/** Estado de un proyecto nuevo: el preset marcado como inicial, si hay uno, o los valores estándar. */
+export function initialState() {
+  const start = getDefaultPreset(loadLibrary());
+  return start ? applyPreset(createDefaultState(), start) : createDefaultState();
+}
+
 /**
  * Punto de composición: crea el store, los recursos, la vista previa y el panel,
  * y define las acciones de alto nivel (exportar, importar, vídeo, presets…).
  */
-export function startApp() {
+export function startApp({ boot = null } = {}) {
   const prefs = createPrefs();
   let library = loadLibrary();
 
-  // Proyecto de partida: el guardado en este navegador o, si no hay, el preset marcado como inicial.
-  const startPreset = getDefaultPreset(library);
-  const store = createStore(loadSaved() ?? (startPreset ? applyPreset(createDefaultState(), startPreset) : undefined));
+  // Biblioteca de proyectos (IndexedDB). Sin ella (`boot` nulo) se usa el guardado clásico en localStorage.
+  const projects = boot?.projects ?? null;
+  let currentId = boot?.current.meta.id ?? null;
+
+  // Proyecto de partida: el abierto en la biblioteca o, si no hay, el guardado clásico o el estado inicial.
+  const store = createStore(boot ? hydrate(boot.current.state) : (loadSaved() ?? initialState()));
   const assets = createAssets(() => preview.invalidate());
   const recorder = createRecorderDialog();
   const menu = createContextMenu();
@@ -90,9 +100,44 @@ export function startApp() {
     if (panels.active === 'presets') panels.render();
   });
 
-  autosave(store, {
-    onQuotaExceeded: () => toast('El proyecto pesa demasiado para guardarse solo. Usa Exportar > Proyecto JSON.', true),
-  });
+  const quotaMessage = 'El proyecto pesa demasiado para guardarse solo. Usa Exportar > Proyecto JSON.';
+  let lastThumbAt = 0;
+  /** Miniatura de la primera slide (dataURL pequeño) para la lista de proyectos. */
+  function makeThumb() {
+    const { rc, slides } = preview.carousel;
+    const full = renderSlideToCanvas(rc, slides[0]);
+    const c = document.createElement('canvas');
+    c.width = 360;
+    c.height = Math.round((360 * rc.H) / rc.W);
+    c.getContext('2d').drawImage(full, 0, 0, c.width, c.height);
+    return c.toDataURL('image/jpeg', 0.72);
+  }
+  /** Datos de la ficha del proyecto al guardar; la miniatura se renueva como mucho cada pocos segundos. */
+  function describeProject(force = false) {
+    try {
+      preview.flush();
+      const out = { slides: preview.carousel.slides.length };
+      const t = performance.now();
+      if (force || !lastThumbAt || t - lastThumbAt > 4000) {
+        out.thumb = makeThumb();
+        lastThumbAt = t;
+      }
+      return out;
+    } catch {
+      return {};
+    }
+  }
+  const projectSaver = projects
+    ? autosaveProject(store, projects, {
+        getId: () => currentId,
+        describe: describeProject,
+        onError: () => toast(quotaMessage, true),
+      })
+    : (autosave(store, { onQuotaExceeded: () => toast(quotaMessage, true) }), null);
+  // Al ocultar o cerrar la pestaña se guarda lo pendiente.
+  const flushNow = () => projectSaver?.flush();
+  document.addEventListener('visibilitychange', () => document.visibilityState === 'hidden' && flushNow());
+  window.addEventListener('pagehide', flushNow);
 
   const preview = createPreview({
     store,
@@ -251,10 +296,83 @@ export function startApp() {
     },
   };
 
+  function stopVideo() {
+    if (!assets.video) return;
+    assets.video.pause();
+    URL.revokeObjectURL(assets.video.src);
+    assets.video = null;
+  }
+
+  /** Cambia al proyecto cargado (sin que abrirlo cuente como una edición). */
+  function switchTo(loaded) {
+    stopVideo();
+    currentId = loaded.meta.id;
+    lastThumbAt = 0;
+    projectSaver.withoutSaving(() => store.replace(loaded.state));
+    prefs.setLastProject(currentId);
+    if (loaded.video) actions.attachVideo(loaded.video.blob, { persist: false });
+    actions.ensureFontLoaded();
+  }
+
+  /** Biblioteca de proyectos: la usa la pantalla de inicio (fase 4) y la automatización. */
+  const projectsApi = {
+    available: !!projects,
+    get currentId() {
+      return currentId;
+    },
+    list: () => (projects ? projects.list() : Promise.resolve([])),
+
+    /** Abre un proyecto de la biblioteca guardando antes el actual. */
+    async open(id) {
+      if (!projects || id === currentId) return false;
+      await projectSaver.flush();
+      const loaded = await projects.load(id);
+      if (!loaded) {
+        toast('No se encontró ese proyecto.', true);
+        return false;
+      }
+      switchTo(loaded);
+      return true;
+    },
+
+    /** Crea un proyecto (vacío con el estado inicial, o con `state`) y lo abre. */
+    async create({ name, state } = {}) {
+      if (!projects) return null;
+      await projectSaver.flush();
+      const meta = await projects.create({ name, state: state ?? initialState() });
+      switchTo(await projects.load(meta.id));
+      // Ficha completa (nº de slides y miniatura) desde el primer momento.
+      return (await projects.save(meta.id, store.state, describeProject(true))) ?? meta;
+    },
+
+    async duplicate(id) {
+      if (!projects) return null;
+      if (id === currentId) await projectSaver.flush();
+      return projects.duplicate(id);
+    },
+
+    rename: (id, name) => (projects ? projects.rename(id, name) : Promise.resolve(null)),
+
+    /** Elimina un proyecto. Si era el abierto, pasa al más reciente (o crea uno nuevo si no queda ninguno). */
+    async remove(id) {
+      if (!projects) return false;
+      const wasCurrent = id === currentId;
+      if (wasCurrent) await projectSaver.flush();
+      const ok = await projects.remove(id);
+      if (ok && wasCurrent) {
+        const rest = await projects.list();
+        if (rest.length) switchTo(await projects.load(rest[0].id));
+        else await projectsApi.create();
+      }
+      return ok;
+    },
+  };
+
   const actions = {
     presets,
     pwa,
     ui,
+    projects: projectsApi,
 
     exportPngCurrent: () =>
       withStaticPreview(({ rc, slides }) => exportSlidePng({ rc, slide: slides[preview.current], notify: toast })),
@@ -324,10 +442,21 @@ export function startApp() {
           presets.importData(data);
           return;
         }
-        store.replace(data);
-        if (store.state.media.type === 'video' && !assets.video) {
-          toast('Proyecto importado. Vuelve a subir el vídeo: no se guarda en el archivo.');
-        } else toast('Proyecto importado.');
+        const needsVideo = hydrate(data).media.type === 'video';
+        if (projects) {
+          // Con biblioteca, un archivo importado es un proyecto nuevo: el actual no se toca.
+          const state = hydrate(data);
+          await projectsApi.create({ name: defaultProjectName(state), state });
+        } else {
+          store.replace(data);
+        }
+        toast(
+          needsVideo
+            ? 'Proyecto importado. Vuelve a subir el vídeo: no se guarda en el archivo.'
+            : projects
+              ? 'Proyecto importado como proyecto nuevo.'
+              : 'Proyecto importado.',
+        );
       } catch (e) {
         toast(
           e instanceof UserError ? e.message : 'El archivo no es un proyecto válido (JSON o HTML exportado).',
@@ -338,21 +467,21 @@ export function startApp() {
 
     /** Vuelve al punto de partida: el preset inicial, si hay uno, o los valores estándar. */
     reset() {
-      if (assets.video) {
-        assets.video.pause();
-        assets.video = null;
-      }
+      stopVideo();
+      if (projects && currentId) projects.clearVideo(currentId).catch(() => {});
       const start = getDefaultPreset(library);
       const base = createDefaultState();
       store.replace(start ? applyPreset(base, start) : base);
       actions.ensureFontLoaded();
     },
 
-    async setVideo(file) {
-      if (assets.video) {
-        assets.video.pause();
-        URL.revokeObjectURL(assets.video.src);
-      }
+    /** Vídeo subido por el usuario: se usa y, si hay biblioteca, se guarda con el proyecto. */
+    setVideo: (file) => actions.attachVideo(file, { persist: true }),
+
+    /** Carga un vídeo como medio del post. `persist`: guardarlo también en el proyecto abierto. */
+    async attachVideo(file, { persist = false } = {}) {
+      stopVideo();
+      let failed = false;
       const v = document.createElement('video');
       v.muted = true;
       v.playsInline = true;
@@ -362,14 +491,24 @@ export function startApp() {
       await new Promise((res, rej) => {
         v.onloadeddata = res;
         v.onerror = () => rej(new Error('No se pudo leer el vídeo.'));
-      }).catch((e) => toast(e.message, true));
+      }).catch((e) => {
+        failed = true;
+        toast(e.message, true);
+      });
       await resolveVideoDuration(v);
       v.addEventListener('seeked', () => {
         if (preview.mode === 'static') preview.renderStatic();
         preview.scheduleThumbs();
       });
       assets.video = v;
-      store.set('media.videoTime', 0);
+      if (persist) {
+        store.set('media.videoTime', 0);
+        if (projects && currentId && !failed) {
+          projects.setVideo(currentId, file, file.name ?? '').catch(() => {
+            toast('El vídeo no cabe en el almacenamiento: se verá ahora, pero no al volver a abrir el proyecto.', true);
+          });
+        }
+      } else preview.invalidate(); // al reabrir un proyecto no hay cambio en el store: se redibuja a mano
       panels.render();
     },
 
@@ -487,6 +626,9 @@ export function startApp() {
     actions.ensureFontLoaded();
     preview.invalidate();
   });
+
+  // Vídeo guardado con el proyecto abierto.
+  if (boot?.current.video) actions.attachVideo(boot.current.video.blob, { persist: false });
 
   return { store, assets, preview, actions };
 }

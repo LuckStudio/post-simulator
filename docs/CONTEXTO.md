@@ -111,3 +111,9 @@ Herramienta web (un único HTML) para **simular cómo se verá una publicación 
   de slide y mantener pulsado abre las acciones de la slide. Hojas inferiores para acciones y para
   exportar, con «Compartir» nativo (Web Share con archivos; si no hay, descarga ZIP/PNG). El botón
   «atrás» del móvil cierra la capa abierta. Ajuste nuevo «Vista previa flotante» en Configuración.
+- **v0.8 — biblioteca de proyectos (fase 3 del brief de ampliación).** Los proyectos se guardan en
+  IndexedDB (base `post-simulator`), cada uno con su estado, su miniatura y su vídeo (como Blob, así que
+  el vídeo ya sobrevive a recargar). Al arrancar se abre el último proyecto usado; el proyecto antiguo de
+  localStorage se pasa a la biblioteca una sola vez. Importar un archivo crea un proyecto nuevo en vez de
+  pisar el actual. Si el navegador no permite IndexedDB, se sigue con el guardado clásico. Todavía no hay
+  pantalla para gestionarlos (fase 4): la API está en `actions.projects` y en `window.carruselStudio.projects`.

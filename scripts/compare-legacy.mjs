@@ -116,6 +116,7 @@ async function capture(browser, url, patch, { animate = false } = {}) {
     ([key, value]) => {
       try {
         localStorage.clear();
+        indexedDB.deleteDatabase('post-simulator'); // biblioteca de proyectos: empezar siempre limpio
         if (value) localStorage.setItem(key, value);
       } catch {
         /* sin almacenamiento */
@@ -125,6 +126,7 @@ async function capture(browser, url, patch, { animate = false } = {}) {
   );
   await page.goto(url);
   await page.clock.runFor(1000);
+  if (!legacy) await page.waitForFunction(() => window.carruselStudio, null, { polling: 'raf' }).catch(() => {});
 
   const count = await page.evaluate(legacy ? COUNT_LEGACY : COUNT_CURRENT);
   const times = animate ? ANIM_TIMES : [null];
