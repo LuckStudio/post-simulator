@@ -64,6 +64,7 @@ describe('prefs', () => {
       ui: { appearance: 'system', mobilePreview: 'top', startScreen: 'home', density: 'comfortable' },
       lastProject: null,
       legacyMigrated: false,
+      createMode: 'guided',
     });
   });
 });

@@ -10,6 +10,7 @@ const defaults = () => ({
   ui: { ...DEFAULT_UI },
   lastProject: null,
   legacyMigrated: false,
+  createMode: 'guided',
 });
 const cleanList = (v, max) => (Array.isArray(v) ? v.filter((x) => typeof x === 'string' && x).slice(0, max) : []);
 
@@ -28,6 +29,7 @@ export function createPrefs(storage = globalThis.localStorage) {
         ui: normalizeUi(raw.ui),
         lastProject: typeof raw.lastProject === 'string' && raw.lastProject ? raw.lastProject : null,
         legacyMigrated: raw.legacyMigrated === true,
+        createMode: raw.createMode === 'free' ? 'free' : 'guided',
       };
     } catch {
       return defaults();
@@ -64,6 +66,12 @@ export function createPrefs(storage = globalThis.localStorage) {
     setLastProject(id) {
       const p = read();
       p.lastProject = typeof id === 'string' && id ? id : null;
+      write(p);
+    },
+    /** Cómo se empieza un proyecto nuevo: 'guided' (paso a paso) o 'free' (desde cero). */
+    setCreateMode(mode) {
+      const p = read();
+      p.createMode = mode === 'free' ? 'free' : 'guided';
       write(p);
     },
     /** Marca que el proyecto antiguo de localStorage ya se pasó a la biblioteca. */

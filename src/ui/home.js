@@ -3,7 +3,7 @@ import { $, h } from './dom.js';
 import { svgIcon } from './icons.js';
 import { overlays } from './overlays.js';
 import { openSheet } from './sheet.js';
-import { TEMPLATES, stateFromTemplate } from '../state/templates.js';
+import { TEMPLATES, stateFromTemplate, stepCount } from '../state/templates.js';
 
 const BRAND_ICON = './favicon.svg';
 
@@ -17,8 +17,9 @@ const BRAND_ICON = './favicon.svg';
  * @param {object} o.menu      menú contextual (createContextMenu)
  * @param {()=>void} o.onImport  abre el selector de archivos para importar
  * @param {()=>object} o.makeInitial  estado inicial de un proyecto (valores estándar o preset inicial)
+ * @param {{get:()=>'guided'|'free', set:(m:string)=>void}} o.createMode  cómo se empieza un proyecto nuevo (se recuerda)
  */
-export function createHome({ projects, menu, onImport, makeInitial }) {
+export function createHome({ projects, menu, onImport, makeInitial, createMode }) {
   const root = $('#home');
   const html = document.documentElement;
   let seq = 0; // descarta respuestas de listados antiguos si hay varios seguidos
@@ -53,14 +54,43 @@ export function createHome({ projects, menu, onImport, makeInitial }) {
     enterEditor();
   }
 
-  async function createFrom(template) {
-    await projects.create({ name: template.name, state: stateFromTemplate(template.id, makeInitial()) });
+  async function createFrom(template, mode) {
+    await projects.create({
+      name: template.name,
+      state: stateFromTemplate(template.id, makeInitial()),
+      guide: mode === 'guided' ? { template: template.id, step: 0 } : null,
+    });
     enterEditor();
   }
 
   /** «Nuevo proyecto»: hoja con las plantillas para elegir el punto de partida. */
   function chooseTemplate(opener) {
     let sheet = null;
+    let mode = createMode.get();
+    const MODES = [
+      ['guided', 'Paso a paso', 'Te vamos pidiendo lo importante, un paso cada vez.'],
+      ['free', 'Desde cero', 'Entras directo al editor con todo a mano.'],
+    ];
+    const modeHint = h('p', { class: 'hint' });
+    const modeBtns = MODES.map(([value, label]) =>
+      h(
+        'button',
+        {
+          type: 'button',
+          onclick: () => {
+            mode = value;
+            createMode.set(value);
+            syncMode();
+          },
+        },
+        label,
+      ),
+    );
+    function syncMode() {
+      modeBtns.forEach((b, i) => b.setAttribute('aria-pressed', String(MODES[i][0] === mode)));
+      modeHint.textContent = MODES.find(([v]) => v === mode)[2];
+    }
+    syncMode();
     const list = h(
       'ul',
       { class: 'tpl-list' },
@@ -75,7 +105,7 @@ export function createHome({ projects, menu, onImport, makeInitial }) {
               class: 'tpl',
               onclick: () => {
                 sheet.close({ restoreFocus: false });
-                createFrom(t);
+                createFrom(t, mode);
               },
             },
             h('span', { class: 'tpl-icon' }, svgIcon(t.icon, 24)),
@@ -89,6 +119,8 @@ export function createHome({ projects, menu, onImport, makeInitial }) {
       content: h(
         'div',
         { class: 'tpl-wrap' },
+        h('div', { class: 'seg', role: 'group', 'aria-label': 'Cómo quieres empezar' }, modeBtns),
+        modeHint,
         h('p', { class: 'hint' }, 'Elige un punto de partida. Todo el texto es de ejemplo: cámbialo por el tuyo.'),
         list,
       ),
@@ -170,7 +202,9 @@ export function createHome({ projects, menu, onImport, makeInitial }) {
         h('strong', { class: 'pc-name' }, m.name),
         h('span', { class: 'pc-meta' }, `Editado ${timeAgo(m.updatedAt)}`),
         h('span', { class: 'pc-meta' }, metaLine(m)),
-        hero && h('span', { class: 'btn primary pc-go' }, 'Seguir editando'),
+        m.guide &&
+          h('span', { class: 'pc-badge' }, `Paso a paso · ${m.guide.step + 1} de ${stepCount(m.guide.template)}`),
+        hero && h('span', { class: 'btn primary pc-go' }, m.guide ? 'Seguir el paso a paso' : 'Seguir editando'),
       ),
     );
     const el = h('li', { class: `pc${hero ? ' hero' : ''}` }, main, more);

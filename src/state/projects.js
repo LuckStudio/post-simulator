@@ -13,6 +13,7 @@ const MAX_NAME = 80;
  * @property {number} slides      nº de slides del carrusel
  * @property {boolean} hasVideo   si hay un vídeo guardado para el proyecto
  * @property {string|null} thumb  miniatura de la primera slide (dataURL), si hay
+ * @property {{template:string, step:number}|null} [guide]  modo guiado en curso (plantilla y paso), si lo hay
  */
 
 /** Nombre inicial razonable a partir del contenido: título de la portada, autor o uno genérico. */
@@ -39,6 +40,13 @@ export function uniqueName(base, taken, { copy = false } = {}) {
   let n = 1;
   while (used.has(make(n).toLowerCase())) n++;
   return make(n);
+}
+
+/** Deja `{ template, step }` con tipos correctos; algo que no lo sea, `null`. */
+export function cleanGuide(g) {
+  if (!g || typeof g.template !== 'string' || !g.template) return null;
+  const step = Number.isInteger(g.step) && g.step >= 0 ? g.step : 0;
+  return { template: g.template, step };
 }
 
 function defaultUid() {
@@ -79,14 +87,19 @@ export function createProjects(backend, { now = Date.now, uid = defaultUid } = {
      * @param {{name?:string, state:object, video?:{blob:Blob, name?:string}|null, slides?:number, thumb?:string|null}} o
      * @returns {Promise<ProjectMeta>}
      */
-    async create({ name, state, video = null, slides, thumb }) {
+    async create({ name, state, video = null, slides, thumb, guide = null }) {
       const t = now();
       const id = uid();
       const taken = (await backend.all('meta')).map((m) => m.name);
       const meta = metaOf(
         state,
         { id, name: uniqueName(cleanName(name) || defaultProjectName(state), taken), createdAt: t, updatedAt: t },
-        { hasVideo: !!video, ...(slides ? { slides } : {}), ...(thumb !== undefined ? { thumb } : {}) },
+        {
+          hasVideo: !!video,
+          ...(slides ? { slides } : {}),
+          ...(thumb !== undefined ? { thumb } : {}),
+          ...(guide ? { guide: cleanGuide(guide) } : {}),
+        },
       );
       const ops = [
         { op: 'put', store: 'meta', value: meta },
@@ -185,6 +198,17 @@ export function createProjects(backend, { now = Date.now, uid = defaultUid } = {
         { op: 'put', store: 'blobs', value: { id, blob, name } },
         { op: 'put', store: 'meta', value: meta },
       ]);
+      return meta;
+    },
+
+    /** Guarda el avance del modo guiado (o lo quita con `null`). No cuenta como edición. */
+    async setGuide(id, guide) {
+      const prev = await backend.get('meta', id);
+      if (!prev) return null;
+      const { guide: _old, ...rest } = prev;
+      const clean = cleanGuide(guide);
+      const meta = clean ? { ...rest, guide: clean } : rest;
+      await backend.batch([{ op: 'put', store: 'meta', value: meta }]);
       return meta;
     },
 

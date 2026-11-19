@@ -3,7 +3,13 @@ import { createDefaultState } from '../src/state/defaults.js';
 import { bootProjects } from '../src/state/boot.js';
 import { autosaveProject } from '../src/state/persistence.js';
 import { createPrefs } from '../src/state/prefs.js';
-import { createProjects, defaultProjectName, cleanName, DEFAULT_PROJECT_NAME } from '../src/state/projects.js';
+import {
+  createProjects,
+  defaultProjectName,
+  cleanName,
+  cleanGuide,
+  DEFAULT_PROJECT_NAME,
+} from '../src/state/projects.js';
 import { createMemoryBackend } from '../src/state/projectsDb.js';
 import { createStore } from '../src/state/store.js';
 
@@ -131,6 +137,44 @@ describe('biblioteca de proyectos', () => {
       ]),
     ).rejects.toThrow();
     expect(await backend.all('meta')).toEqual([]);
+  });
+});
+
+describe('modo guiado en la ficha del proyecto', () => {
+  it('cleanGuide deja plantilla y paso válidos o nada', () => {
+    expect(cleanGuide({ template: 'empleo', step: 2 })).toEqual({ template: 'empleo', step: 2 });
+    expect(cleanGuide({ template: 'empleo', step: -1 })).toEqual({ template: 'empleo', step: 0 });
+    expect(cleanGuide({ template: 'empleo', step: 'x', extra: 1 })).toEqual({ template: 'empleo', step: 0 });
+    expect(cleanGuide({ step: 1 })).toBeNull();
+    expect(cleanGuide(null)).toBeNull();
+  });
+
+  it('se puede crear con guía, avanzar, conservarla al autoguardar y quitarla', async () => {
+    const { projects } = setup();
+    const m = await projects.create({ name: 'G', state: stateWith(), guide: { template: 'guia', step: 0 } });
+    expect(m.guide).toEqual({ template: 'guia', step: 0 });
+    expect((await projects.setGuide(m.id, { template: 'guia', step: 3 })).guide.step).toBe(3);
+    const saved = await projects.save(m.id, stateWith(), { slides: 2 });
+    expect(saved.guide).toEqual({ template: 'guia', step: 3 });
+    const cleared = await projects.setGuide(m.id, null);
+    expect('guide' in cleared).toBe(false);
+    expect('guide' in (await projects.getMeta(m.id))).toBe(false);
+    expect(await projects.setGuide('x', { template: 'a', step: 0 })).toBeNull();
+  });
+
+  it('cambiar el paso no cuenta como edición (no mueve la fecha)', async () => {
+    const { projects } = setup();
+    const m = await projects.create({ name: 'G', state: stateWith(), guide: { template: 'guia', step: 0 } });
+    const after = await projects.setGuide(m.id, { template: 'guia', step: 1 });
+    expect(after.updatedAt).toBe(m.updatedAt);
+  });
+
+  it('un proyecto sin guía no la tiene, y duplicar conserva la del original', async () => {
+    const { projects } = setup();
+    const plain = await projects.create({ name: 'P', state: stateWith() });
+    expect('guide' in plain).toBe(false);
+    const g = await projects.create({ name: 'G', state: stateWith(), guide: { template: 'evento', step: 2 } });
+    expect((await projects.duplicate(g.id)).guide).toEqual({ template: 'evento', step: 2 });
   });
 });
 

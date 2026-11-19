@@ -78,27 +78,35 @@ Un carrusel de ejemplo (portada, publicación con imagen y cierre) en formato 4:
   </tr>
   <tr>
     <td width="50%" valign="top">
+      <h3>🧭 Paso a paso</h3>
+      <p>Si no sabes por dónde empezar, elige una plantilla y la herramienta te pide lo importante, un paso cada vez: el puesto, los detalles, el texto, el cierre, el estilo. La vista previa te enseña la slide que estás rellenando y puedes pasar al editor completo cuando quieras. Si lo dejas a medias, al volver sigues en el mismo paso.</p>
+      <img src="docs/img/paso-a-paso.png" alt="El paso 2 de 7 de la plantilla de oferta de empleo, con la vista previa de la portada">
+    </td>
+    <td width="50%" valign="top">
       <h3>🗂️ Tus proyectos, siempre a mano</h3>
       <p>Cada publicación se guarda sola en tu dispositivo, vídeo incluido. Desde la pantalla de inicio sigues donde lo dejaste, abres otro proyecto, lo duplicas, lo renombras, lo descargas o lo eliminas. Para empezar uno nuevo eliges una plantilla: publicación libre, oferta de empleo, evento, novedad o lanzamiento, o una guía en slides.</p>
       <img src="docs/img/inicio.png" alt="Pantalla de inicio con el último proyecto y otros proyectos guardados">
     </td>
+  </tr>
+  <tr>
     <td width="50%" valign="top" align="center">
       <h3>📲 Inicio en el móvil</h3>
       <p align="left">La misma pantalla, pensada para el pulgar. Con «Atrás» del móvil vuelves del editor a tus proyectos.</p>
       <img src="docs/img/inicio-movil.png" alt="Pantalla de inicio en un móvil" width="260">
     </td>
-  </tr>
-  <tr>
     <td width="50%" valign="top">
       <h3>⚙️ A tu gusto</h3>
       <p>Interfaz clara, oscura o automática (como tu dispositivo) y una vista compacta que deja más sitio a la vista previa. Preparada para añadir más formas de verla.</p>
       <img src="docs/img/configuracion.png" alt="Pestaña de Configuración con la apariencia y la densidad de la interfaz">
     </td>
+  </tr>
+  <tr>
     <td width="50%" valign="top" align="center">
       <h3>📱 También en el móvil</h3>
       <p align="left">Se instala como una app y funciona sin conexión. La vista previa se encoge y se queda fija al bajar por los campos; tócala para verla a pantalla completa, desliza para cambiar de slide, mantén pulsado para las acciones y comparte directo a Instagram o WhatsApp desde «Exportar».</p>
       <img src="docs/img/movil.png" alt="La herramienta en un móvil, con la barra de secciones abajo" width="260">
     </td>
+    <td width="50%"></td>
   </tr>
 </table>
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createDefaultState } from '../src/state/defaults.js';
-import { TEMPLATES, getTemplate, stateFromTemplate } from '../src/state/templates.js';
+import { getPath } from '../src/core/utils.js';
+import { TEMPLATES, getTemplate, stateFromTemplate, stepCount } from '../src/state/templates.js';
 import { UI_ICON } from '../src/ui/icons.js';
 
 describe('plantillas', () => {
@@ -64,5 +65,43 @@ describe('plantillas', () => {
 
   it('una plantilla desconocida da un error claro', () => {
     expect(() => stateFromTemplate('nada', createDefaultState())).toThrow('Plantilla desconocida');
+  });
+});
+
+describe('pasos del modo guiado', () => {
+  it('cada plantilla tiene pasos, ids únicos y termina en la pantalla final', () => {
+    for (const t of TEMPLATES) {
+      expect(t.steps.length, t.id).toBeGreaterThan(2);
+      expect(new Set(t.steps.map((s) => s.id)).size, t.id).toBe(t.steps.length);
+      expect(t.steps.at(-1).finish, t.id).toBe(true);
+      expect(stepCount(t.id)).toBe(t.steps.length);
+    }
+    expect(stepCount('nada')).toBe(0);
+  });
+
+  it('cada paso es de un solo tipo y sus campos existen en el proyecto', () => {
+    for (const t of TEMPLATES) {
+      const state = stateFromTemplate(t.id, createDefaultState());
+      for (const step of t.steps) {
+        const kinds = [!!step.fields, !!step.panel, !!step.finish].filter(Boolean).length;
+        expect(kinds, `${t.id}/${step.id}`).toBe(1);
+        expect(step.title && step.hint).toBeTruthy();
+        if (step.panel) expect(['media', 'style']).toContain(step.panel);
+        for (const f of step.fields ?? []) {
+          expect(getPath(state, f.path), `${t.id}/${step.id}: ${f.path}`).not.toBeUndefined();
+          expect(f.label).toBeTruthy();
+        }
+      }
+    }
+  });
+
+  it('los pasos que enseñan portada o cierre solo están si la plantilla los incluye', () => {
+    for (const t of TEMPLATES) {
+      const state = stateFromTemplate(t.id, createDefaultState());
+      for (const step of t.steps) {
+        if (step.show === 'cover') expect(state.cover.on, `${t.id}/${step.id}`).toBe(true);
+        if (step.show === 'cta') expect(state.cta.on, `${t.id}/${step.id}`).toBe(true);
+      }
+    }
   });
 });

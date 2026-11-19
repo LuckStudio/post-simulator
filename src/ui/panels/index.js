@@ -4,6 +4,7 @@ import { animPanel } from './anim.js';
 import { coverPanel } from './cover.js';
 import { ctaPanel } from './cta.js';
 import { exportPanel } from './export.js';
+import { guidePanel } from './guide.js';
 import { mediaPanel } from './media.js';
 import { postPanel } from './post.js';
 import { presetsPanel } from './presets.js';
@@ -69,17 +70,26 @@ export function createPanelHost(deps) {
 
   function render() {
     const scroll = body.scrollTop;
+    const guided = deps.guide?.active;
     const [, label, , panel] = SECTIONS.find(([id]) => id === active);
-    title.textContent = label;
-    const nodes = [panel({ ...deps, rerender: render })].flat(Infinity).filter(Boolean);
+    title.textContent = guided ? deps.guide.step.title : label;
+    const nodes = [(guided ? guidePanel : panel)({ ...deps, rerender: render })].flat(Infinity).filter(Boolean);
     body.replaceChildren(...nodes);
     body.scrollTop = scroll;
   }
 
-  /** Cambia de sección y vuelve al principio de sus ajustes. */
+  /** Cambia de sección y vuelve al principio de sus ajustes (y sale del modo guiado, si lo hay). */
   function select(id) {
+    // Ir a una sección concreta (menú de slide, Configuración…) saca del paso a paso.
+    if (deps.guide?.active) deps.guide.exit();
     active = id;
     renderTabs();
+    render();
+    body.scrollTop = 0;
+  }
+
+  /** Repinta el panel desde arriba (al cambiar de paso del modo guiado). */
+  function renderFromTop() {
     render();
     body.scrollTop = 0;
   }
@@ -87,6 +97,7 @@ export function createPanelHost(deps) {
   return {
     renderTabs,
     render,
+    renderFromTop,
     select,
     get active() {
       return active;

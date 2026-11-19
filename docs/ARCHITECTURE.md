@@ -144,6 +144,16 @@ biblioteca (IndexedDB no disponible) no hay inicio: `data-library="off"` oculta 
 probada. `home.js` las muestra en una hoja al pulsar «Nuevo proyecto». Para añadir una plantilla basta una
 entrada nueva con su parche y un icono de `UI_ICON`.
 
+### Modo paso a paso (`ui/panels/guide.js`, `guide` en `app.js`)
+
+Cada plantilla trae `steps` (datos puros en `templates.js`): un paso es una lista de campos (`fields`), una
+sección del editor reutilizada (`panel`: `media` o `style`) o la pantalla final (`finish`), y `show` dice qué
+slide enseñar. El controlador `guide` (en `app.js`) guarda `{ template, step }`, lo persiste en la ficha del
+proyecto con `projects.setGuide` (no cuenta como edición) y marca `data-guided` en `<html>` para ocultar la
+barra de secciones. `createPanelHost` pinta `guidePanel` en vez de la sección activa mientras `guide.active`;
+cualquier navegación explícita a una sección (`panels.select`) sale del modo guiado. Para añadir un paso
+basta una entrada en `steps` con rutas que existan en `DEFAULT_STATE` (hay una prueba que lo comprueba).
+
 ## Móvil (`ui/mobile.js` y piezas asociadas)
 
 Misma interfaz y mismos paneles que el escritorio; en pantallas de hasta 900 px solo cambia la

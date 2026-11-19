@@ -129,3 +129,10 @@ Herramienta web (un único HTML) para **simular cómo se verá una publicación 
   estado inicial, así que respeta el preset marcado como inicial. El nombre del proyecto sale de la
   plantilla y se numera si ya existe. El modo «paso a paso» (elegir entre guiado y desde cero) llega en la
   fase 6: hoy todas las plantillas se abren en el editor normal.
+- **v0.11 — modo paso a paso (fase 6 del brief de ampliación).** Al crear un proyecto se elige «Paso a
+  paso» (por defecto) o «Desde cero»; la elección se recuerda. En el paso a paso, cada plantilla lleva sus
+  pasos (p. ej. oferta de empleo: puesto, detalles, texto, marca, cierre, estilo, listo): el panel muestra
+  solo los campos del paso, la vista previa enseña la slide que se está rellenando y hay Atrás / Siguiente,
+  avance «Paso N de M» y «Ir al editor completo». El paso en curso se guarda en la ficha del proyecto: en
+  inicio se ve «Paso a paso · N de M» y al abrirlo se continúa donde se dejó. Es el mismo proyecto que en el
+  editor completo, así que todo lo editado vale en ambos. Con esto se cierran las seis fases del brief.

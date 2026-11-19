@@ -6,6 +6,7 @@ import { createStore, hydrate } from './state/store.js';
 import { createDefaultState } from './state/defaults.js';
 import { autosave, autosaveProject, loadSaved } from './state/persistence.js';
 import { defaultProjectName } from './state/projects.js';
+import { getTemplate } from './state/templates.js';
 import { createPrefs } from './state/prefs.js';
 import {
   addPreset,
@@ -74,6 +75,13 @@ function resolveVideoDuration(v) {
   });
 }
 
+/** Un avance del modo guiado solo vale si su plantilla existe; el paso se ajusta a su número de pasos. */
+function validGuide(g) {
+  const t = g && getTemplate(g.template);
+  if (!t) return null;
+  return { template: g.template, step: Math.min(Math.max(0, g.step | 0), t.steps.length - 1) };
+}
+
 /** Estado de un proyecto nuevo: el preset marcado como inicial, si hay uno, o los valores estándar. */
 export function initialState() {
   const start = getDefaultPreset(loadLibrary());
@@ -91,6 +99,8 @@ export function startApp({ boot = null } = {}) {
   // Biblioteca de proyectos (IndexedDB). Sin ella (`boot` nulo) se usa el guardado clásico en localStorage.
   const projects = boot?.projects ?? null;
   let currentId = boot?.current.meta.id ?? null;
+  /** Modo guiado en curso del proyecto abierto: { template, step } o null. */
+  let guideState = validGuide(boot?.current.meta.guide);
 
   // Proyecto de partida: el abierto en la biblioteca o, si no hay, el guardado clásico o el estado inicial.
   const store = createStore(boot ? hydrate(boot.current.state) : (loadSaved() ?? initialState()));
@@ -309,7 +319,9 @@ export function startApp({ boot = null } = {}) {
     stopVideo();
     currentId = loaded.meta.id;
     lastThumbAt = 0;
+    guideState = validGuide(loaded.meta.guide);
     projectSaver.withoutSaving(() => store.replace(loaded.state));
+    guide.apply({ show: true });
     prefs.setLastProject(currentId);
     if (loaded.video) actions.attachVideo(loaded.video.blob, { persist: false });
     actions.ensureFontLoaded();
@@ -337,10 +349,10 @@ export function startApp({ boot = null } = {}) {
     },
 
     /** Crea un proyecto (vacío con el estado inicial, o con `state`) y lo abre. */
-    async create({ name, state } = {}) {
+    async create({ name, state, guide: startGuide = null } = {}) {
       if (!projects) return null;
       await projectSaver.flush();
-      const meta = await projects.create({ name, state: state ?? initialState() });
+      const meta = await projects.create({ name, state: state ?? initialState(), guide: startGuide });
       switchTo(await projects.load(meta.id));
       // Ficha completa (nº de slides y miniatura) desde el primer momento.
       return (await projects.save(meta.id, store.state, describeProject(true))) ?? meta;
@@ -588,11 +600,69 @@ export function startApp({ boot = null } = {}) {
     },
   };
 
+  // ---------- Modo guiado ----------
+
+  /** Muestra en la vista previa la slide que corresponde al paso (portada, post o cierre). */
+  function showStepSlide(kind) {
+    if (!kind) return;
+    preview.flush();
+    const i = preview.carousel.slides.findIndex((s) => s.type === kind);
+    if (i >= 0) preview.go(i);
+  }
+
+  const guide = {
+    get active() {
+      return !!guideState;
+    },
+    get template() {
+      return guideState?.template ?? null;
+    },
+    get index() {
+      return guideState?.step ?? 0;
+    },
+    get total() {
+      return guideState ? getTemplate(guideState.template).steps.length : 0;
+    },
+    get step() {
+      return getTemplate(guideState.template).steps[guideState.step];
+    },
+    /** Refleja el estado en la interfaz: atributo de <html>, panel y slide del paso. */
+    apply({ show = false } = {}) {
+      const root = document.documentElement;
+      if (guideState) root.dataset.guided = 'on';
+      else delete root.dataset.guided;
+      panels.renderFromTop();
+      if (show && guideState) {
+        showStepSlide(guide.step.show);
+        mobile.expand();
+      }
+    },
+    go(n) {
+      if (!guideState) return;
+      guideState = { ...guideState, step: Math.min(Math.max(0, n), guide.total - 1) };
+      if (projects && currentId) projects.setGuide(currentId, guideState).catch(() => {});
+      guide.apply({ show: true });
+    },
+    next() {
+      if (guide.index + 1 >= guide.total) guide.exit();
+      else guide.go(guide.index + 1);
+    },
+    back: () => guide.go(guide.index - 1),
+    /** Sale del paso a paso y deja el editor completo (el proyecto queda como está). */
+    exit() {
+      guideState = null;
+      if (projects && currentId) projects.setGuide(currentId, null).catch(() => {});
+      delete document.documentElement.dataset.guided;
+      panels.select('post');
+      mobile.expand();
+    },
+  };
+
   // ---------- Panel lateral ----------
 
   // Los campos repintan el panel, y el panel usa los campos: se enlazan de forma perezosa.
   const fields = createFields({ store, rerender: () => panels.render() });
-  const panels = createPanelHost({ store, assets, actions, preview, prefs, f: fields });
+  const panels = createPanelHost({ store, assets, actions, preview, prefs, guide, f: fields });
 
   // Móvil: hoja de exportar, vista completa, gestos y vista previa que se encoge.
   const exportSheet = createExportSheet({ store, preview, actions, panels });
@@ -621,7 +691,12 @@ export function startApp({ boot = null } = {}) {
     .addEventListener?.('change', () => applyUiSettings(prefs.get().ui));
   mountStaticIcons();
   // En el móvil «Exportar» abre la hoja inferior; en el escritorio, la pestaña Exportar.
-  $('#exportGo').onclick = () => (mobile.isNarrow() ? exportSheet.open() : panels.select('export'));
+  $('#exportGo').onclick = () => {
+    if (mobile.isNarrow()) exportSheet.open();
+    else if (guide.active)
+      guide.go(guide.total - 1); // en el paso a paso, Exportar lleva a la pantalla final
+    else panels.select('export');
+  };
   $('#settingsGo').onclick = () => panels.select('settings');
   $('#slideMenuBtn').onclick = (e) => {
     const btn = e.currentTarget;
@@ -630,6 +705,7 @@ export function startApp({ boot = null } = {}) {
       { x: 0, y: 0, opener: btn, anchor: btn.getBoundingClientRect() },
     );
   };
+  guide.apply();
   panels.renderTabs();
   panels.render();
   actions.renderFormatSwitch();
@@ -642,7 +718,13 @@ export function startApp({ boot = null } = {}) {
 
   // Pantalla de inicio (si hay biblioteca) o directamente el editor (guardado clásico).
   const home = projects
-    ? createHome({ projects: projectsApi, menu, onImport: () => actions.openImport(), makeInitial: initialState })
+    ? createHome({
+        projects: projectsApi,
+        menu,
+        onImport: () => actions.openImport(),
+        makeInitial: initialState,
+        createMode: { get: () => prefs.get().createMode, set: (m) => prefs.setCreateMode(m) },
+      })
     : null;
   if (home) home.start();
   else {

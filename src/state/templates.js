@@ -12,7 +12,88 @@ import { hydrate } from './store.js';
  * @property {string} desc   una línea que explica para qué sirve
  * @property {string} icon   clave de `UI_ICON`
  * @property {object} patch  cambios sobre el estado inicial
+ * @property {GuideStep[]} steps  pasos del modo guiado
  */
+
+/**
+ * Paso del modo guiado. Un paso es una de tres cosas:
+ *  - `fields`: unos pocos campos del proyecto (ruta, etiqueta y tipo);
+ *  - `panel`: una sección completa del editor ('media' o 'style');
+ *  - `finish`: la pantalla final con las opciones para descargar o compartir.
+ * `show` indica qué slide enseñar en la vista previa mientras se rellena el paso.
+ *
+ * @typedef {object} GuideStep
+ * @property {string} id
+ * @property {string} title
+ * @property {string} hint
+ * @property {'cover'|'post'|'cta'} [show]
+ * @property {{path:string,label:string,kind?:'text'|'area',rows?:number,ph?:string}[]} [fields]
+ * @property {'media'|'style'} [panel]
+ * @property {boolean} [finish]
+ */
+
+const brandStep = {
+  id: 'marca',
+  title: 'Tu marca',
+  hint: 'El nombre y la descripción que aparecen en la cabecera del post.',
+  show: 'post',
+  fields: [
+    { path: 'author.name', label: 'Nombre' },
+    { path: 'author.headline', label: 'Descripción de la cuenta' },
+    { path: 'author.initials', label: 'Iniciales del avatar' },
+  ],
+};
+const textStep = (hint) => ({
+  id: 'texto',
+  title: 'Texto',
+  hint,
+  show: 'post',
+  fields: [{ path: 'post.text', label: 'Texto de la publicación', kind: 'area', rows: 8 }],
+});
+const mediaStep = {
+  id: 'imagen',
+  title: 'Imagen',
+  hint: 'Añade una imagen, una cuadrícula, un vídeo o un documento. Puedes dejarlo como está.',
+  show: 'post',
+  panel: 'media',
+};
+const styleStep = {
+  id: 'estilo',
+  title: 'Estilo',
+  hint: 'Elige el aspecto de las slides: tema, colores y tipografía.',
+  show: 'post',
+  panel: 'style',
+};
+const finishStep = {
+  id: 'listo',
+  title: '¡Listo!',
+  hint: 'Revisa el resultado en la vista previa y descárgalo o compártelo.',
+  finish: true,
+};
+const offerStep = (title, hint) => ({
+  id: 'cierre',
+  title,
+  hint,
+  show: 'cta',
+  fields: [
+    { path: 'cta.offerTitle', label: 'Título' },
+    { path: 'cta.offerText', label: 'Texto', kind: 'area', rows: 3 },
+    { path: 'cta.offerBtn', label: 'Botón' },
+    { path: 'cta.handle', label: 'Usuario o cuenta', ph: '@tucuenta' },
+  ],
+});
+const seekStep = (hint) => ({
+  id: 'cierre',
+  title: 'Cierre',
+  hint,
+  show: 'cta',
+  fields: [
+    { path: 'cta.seekTitle', label: 'Título' },
+    { path: 'cta.seekText', label: 'Texto', kind: 'area', rows: 3 },
+    { path: 'cta.seekBtn', label: 'Botón' },
+    { path: 'cta.handle', label: 'Usuario o cuenta', ph: '@tucuenta' },
+  ],
+});
 
 /** @type {Template[]} */
 export const TEMPLATES = [
@@ -23,6 +104,13 @@ export const TEMPLATES = [
     desc: 'Un post con texto e imagen, para probar lo que quieras.',
     icon: 'post',
     patch: {},
+    steps: [
+      brandStep,
+      textStep('Escribe lo que quieres probar. Los #hashtags y @menciones se colorean como en un post real.'),
+      mediaStep,
+      styleStep,
+      finishStep,
+    ],
   },
   {
     id: 'empleo',
@@ -55,6 +143,36 @@ export const TEMPLATES = [
         offerBtn: 'Enviar mensaje',
       },
     },
+    steps: [
+      {
+        id: 'puesto',
+        title: 'El puesto',
+        hint: 'Lo primero que se ve en la portada: qué se busca y quién lo ofrece.',
+        show: 'cover',
+        fields: [
+          { path: 'cover.kicker', label: 'Etiqueta' },
+          { path: 'cover.role', label: 'Puesto', kind: 'area', rows: 2 },
+          { path: 'cover.company', label: 'Empresa' },
+        ],
+      },
+      {
+        id: 'detalles',
+        title: 'Los detalles',
+        hint: 'Lugar, modalidad, contrato y salario. Deja vacío lo que no quieras mostrar.',
+        show: 'cover',
+        fields: [
+          { path: 'cover.location', label: 'Lugar o enlace' },
+          { path: 'cover.modality', label: 'Modalidad' },
+          { path: 'cover.contract', label: 'Contrato' },
+          { path: 'cover.salary', label: 'Salario' },
+        ],
+      },
+      textStep('Cuenta en qué consiste el puesto y a quién buscas.'),
+      brandStep,
+      offerStep('Cómo contactar', 'La última slide invita a escribir para postularse.'),
+      styleStep,
+      finishStep,
+    ],
   },
   {
     id: 'evento',
@@ -87,6 +205,36 @@ export const TEMPLATES = [
         offerBtn: 'Reservar plaza',
       },
     },
+    steps: [
+      {
+        id: 'evento',
+        title: 'El evento',
+        hint: 'Lo primero que se ve en la portada: cómo se llama y quién lo organiza.',
+        show: 'cover',
+        fields: [
+          { path: 'cover.kicker', label: 'Etiqueta' },
+          { path: 'cover.role', label: 'Nombre del evento', kind: 'area', rows: 2 },
+          { path: 'cover.company', label: 'Organiza' },
+        ],
+      },
+      {
+        id: 'cuando',
+        title: 'Cuándo y dónde',
+        hint: 'Fecha, lugar, precio y plazas. Deja vacío lo que no quieras mostrar.',
+        show: 'cover',
+        fields: [
+          { path: 'cover.location', label: 'Lugar o enlace' },
+          { path: 'cover.modality', label: 'Fecha y hora' },
+          { path: 'cover.contract', label: 'Entrada' },
+          { path: 'cover.salary', label: 'Plazas' },
+        ],
+      },
+      textStep('Explica de qué va el evento y por qué merece la pena apuntarse.'),
+      brandStep,
+      offerStep('Cómo apuntarse', 'La última slide invita a reservar plaza.'),
+      styleStep,
+      finishStep,
+    ],
   },
   {
     id: 'novedad',
@@ -110,6 +258,14 @@ export const TEMPLATES = [
         seekBtn: 'Seguir',
       },
     },
+    steps: [
+      brandStep,
+      textStep('Cuenta qué es lo nuevo, en pocas frases y sin rodeos.'),
+      mediaStep,
+      seekStep('La última slide invita a seguir la cuenta para ver más novedades.'),
+      styleStep,
+      finishStep,
+    ],
   },
   {
     id: 'guia',
@@ -143,6 +299,26 @@ export const TEMPLATES = [
         seekBtn: 'Seguir',
       },
     },
+    steps: [
+      {
+        id: 'portada',
+        title: 'La portada',
+        hint: 'El título de la guía y una etiqueta que anticipe de qué trata.',
+        show: 'cover',
+        fields: [
+          { path: 'cover.kicker', label: 'Etiqueta' },
+          { path: 'cover.role', label: 'Título de la guía', kind: 'area', rows: 2 },
+          { path: 'cover.company', label: 'Subtítulo' },
+        ],
+      },
+      textStep(
+        'Escribe un paso o consejo por párrafo, separados por una línea en blanco: cada slide reparte el texto solo.',
+      ),
+      brandStep,
+      seekStep('La última slide invita a guardar la guía y seguir la cuenta.'),
+      styleStep,
+      finishStep,
+    ],
   },
 ];
 
@@ -176,3 +352,6 @@ function mergeOver(base, patch) {
   }
   return out;
 }
+
+/** Número de pasos de una plantilla (0 si no existe). */
+export const stepCount = (templateId) => getTemplate(templateId)?.steps.length ?? 0;

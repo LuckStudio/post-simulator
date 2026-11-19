@@ -182,6 +182,36 @@ async function inicio({ name, mobile }) {
 await inicio({ name: 'inicio.png', mobile: false });
 await inicio({ name: 'inicio-movil.png', mobile: true });
 
+// Paso a paso: la plantilla de oferta de empleo en su segundo paso
+{
+  const ctx = await browser.newContext({
+    viewport: { width: 1280, height: 800 },
+    deviceScaleFactor: 2,
+    colorScheme: 'light',
+  });
+  const page = await ctx.newPage();
+  await page.addInitScript(
+    ([prefs]) => {
+      if (sessionStorage.getItem('preparado')) return;
+      sessionStorage.setItem('preparado', '1');
+      localStorage.clear();
+      indexedDB.deleteDatabase('post-simulator');
+      localStorage.setItem('carrusel-ofertas-prefs-v1', JSON.stringify({ ...prefs, ui: { appearance: 'light' } }));
+    },
+    [PREFS],
+  );
+  await page.goto(APP);
+  await page.waitForSelector('.pc.hero');
+  await page.click('text=Nuevo proyecto');
+  await page.click('.tpl:has-text("Oferta de empleo")');
+  await page.waitForSelector('.g-nav');
+  await page.click('.g-nav .btn.primary');
+  await page.waitForTimeout(700);
+  await page.screenshot({ path: path.join(DOCS, 'paso-a-paso.png') });
+  console.log('✓ docs/img/paso-a-paso.png');
+  await ctx.close();
+}
+
 // Móvil
 {
   const { ctx, page } = await openApp({ width: 390, height: 844, scale: 3 });
