@@ -27,7 +27,7 @@ import { hydrate } from './store.js';
  * @property {string} title
  * @property {string} hint
  * @property {'cover'|'post'|'cta'} [show]
- * @property {{path:string,label:string,kind?:'text'|'area',rows?:number,ph?:string}[]} [fields]
+ * @property {{path:string,label:string,kind?:'text'|'area',rows?:number,ph?:string,rich?:boolean}[]} [fields]
  * @property {'media'|'style'} [panel]
  * @property {boolean} [finish]
  */
@@ -48,7 +48,7 @@ const textStep = (hint) => ({
   title: 'Texto',
   hint,
   show: 'post',
-  fields: [{ path: 'post.text', label: 'Texto de la publicación', kind: 'area', rows: 8 }],
+  fields: [{ path: 'post.text', label: 'Texto de la publicación', kind: 'area', rows: 8, rich: true }],
 });
 const mediaStep = {
   id: 'imagen',

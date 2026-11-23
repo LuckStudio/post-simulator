@@ -1,3 +1,4 @@
+import { splitGraphemes } from '../core/graphemes.js';
 import { clamp } from '../core/utils.js';
 import { EASE } from '../animation/easing.js';
 import { isTextAnim } from '../animation/presets.js';
@@ -39,7 +40,7 @@ export function wrapText(rc, text, maxW, size, weight = 400, accent = false) {
     t,
     w: w ?? ctx.measureText(t).width,
     acc: !!highlight && ACCENT_RE.test(t),
-    n: Array.from(t).length,
+    n: splitGraphemes(t).length,
   });
 
   for (const para of String(text || '').split('\n')) {
@@ -60,7 +61,7 @@ export function wrapText(rc, text, maxW, size, weight = 400, accent = false) {
       if (ww > maxW) {
         push();
         let chunk = '';
-        for (const ch of Array.from(t)) {
+        for (const ch of splitGraphemes(t)) {
           const test = chunk + ch;
           if (chunk && ctx.measureText(test).width > maxW) {
             out.push({ words: [mk(chunk)], w: ctx.measureText(chunk).width });
@@ -179,7 +180,7 @@ export function drawText(ctx, rc, lines, o) {
           reveal -= wd.n;
           cx += wd.w;
         } else {
-          const part = Array.from(wd.t).slice(0, Math.max(0, reveal)).join('');
+          const part = splitGraphemes(wd.t).slice(0, Math.max(0, reveal)).join('');
           ctx.fillText(part, cx, base);
           cx += ctx.measureText(part).width;
           reveal = 0;

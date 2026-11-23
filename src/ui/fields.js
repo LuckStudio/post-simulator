@@ -1,5 +1,7 @@
 import { clamp } from '../core/utils.js';
+import { describeFormat, formatRange, wordAt } from '../core/richText.js';
 import { h } from './dom.js';
+import { toast } from './feedback.js';
 
 /**
  * Fábrica de controles de formulario enlazados al store por ruta.
@@ -43,6 +45,107 @@ export function createFields({ store, rerender }) {
       inp.value = store.get(path) ?? '';
       inp.addEventListener('input', () => set(path, inp.value));
       return field(id, label, inp);
+    },
+
+    /**
+     * Cuadro de texto largo con barra de formato: negrita, cursiva, subrayado, tachado, listas y
+     * «quitar formato». El formato son letras Unicode (lo que se usa en LinkedIn), así que el texto se
+     * puede copiar y pegar tal cual. Atajos: Ctrl/⌘ + B, I, U.
+     */
+    richText(label, path, { rows = 8, ph = '' } = {}) {
+      const id = nextId();
+      const ta = h('textarea', { id, rows, placeholder: ph });
+      ta.value = store.get(path) ?? '';
+      ta.addEventListener('input', () => set(path, ta.value));
+
+      /** Aplica una operación a la selección (o a la palabra bajo el cursor) conservando el «deshacer». */
+      const apply = (op) => {
+        const r = formatRange(ta.value, ta.selectionStart, ta.selectionEnd, op);
+        if (!r) {
+          toast('Selecciona el texto al que quieres darle formato.');
+          ta.focus();
+          return;
+        }
+        ta.focus();
+        ta.setSelectionRange(r.from, r.to);
+        // insertText mantiene el historial de deshacer del cuadro (y lanza «input» solo).
+        if (!document.execCommand?.('insertText', false, r.replacement)) {
+          ta.setRangeText(r.replacement, r.from, r.to, 'end');
+          ta.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        ta.setSelectionRange(r.selStart, r.selEnd);
+        sync();
+      };
+
+      const BUTTONS = [
+        ['bold', 'B', 'Negrita (Ctrl+B)', 'fmt-b'],
+        ['italic', 'I', 'Cursiva (Ctrl+I)', 'fmt-i'],
+        ['underline', 'U', 'Subrayado (Ctrl+U)', 'fmt-u'],
+        ['strike', 'S', 'Tachado', 'fmt-s'],
+        ['bullets', '•', 'Lista con viñetas', 'fmt-list'],
+        ['numbers', '1.', 'Lista numerada', 'fmt-list'],
+        ['clear', 'Tx', 'Quitar formato', 'fmt-clear'],
+      ];
+      const btns = new Map(
+        BUTTONS.map(([op, text, title, cls]) => [
+          op,
+          h(
+            'button',
+            {
+              type: 'button',
+              class: `fmt-btn ${cls}`,
+              title,
+              'aria-label': title,
+              'aria-pressed': 'false',
+              onclick: () => apply(op),
+            },
+            text,
+          ),
+        ]),
+      );
+      const copy = h(
+        'button',
+        {
+          type: 'button',
+          class: 'fmt-btn fmt-copy',
+          title: 'Copiar el texto con su formato para pegarlo en LinkedIn',
+          onclick: async () => {
+            try {
+              await navigator.clipboard.writeText(ta.value);
+              toast('Texto copiado con su formato.');
+            } catch {
+              ta.select();
+              toast('No se pudo copiar solo: el texto está seleccionado, cópialo con Ctrl+C.', true);
+            }
+          },
+        },
+        'Copiar',
+      );
+
+      /** Marca como activos los formatos de lo que está seleccionado (o de la palabra bajo el cursor). */
+      function sync() {
+        let [s, e] = [ta.selectionStart, ta.selectionEnd];
+        if (s === e) [s, e] = wordAt(ta.value, s) ?? [0, 0];
+        const state = describeFormat(ta.value.slice(s, e));
+        const on = { bold: state.bold, italic: state.italic, underline: state.under, strike: state.strike };
+        for (const [op, btn] of btns) btn.setAttribute('aria-pressed', String(!!on[op]));
+      }
+      for (const ev of ['select', 'keyup', 'mouseup', 'focus', 'input']) ta.addEventListener(ev, sync);
+      ta.addEventListener('keydown', (e) => {
+        if (!(e.ctrlKey || e.metaKey) || e.altKey || e.shiftKey) return;
+        const op = { b: 'bold', i: 'italic', u: 'underline' }[e.key.toLowerCase()];
+        if (!op) return;
+        e.preventDefault();
+        apply(op);
+      });
+
+      const bar = h(
+        'div',
+        { class: 'fmt-bar', role: 'toolbar', 'aria-label': 'Formato del texto', 'aria-controls': id },
+        [...btns.values()],
+        copy,
+      );
+      return h('div', { class: 'field' }, h('label', { for: id }, label), bar, ta);
     },
 
     number(label, path, { min = 0, max = 1e9, step = 1 } = {}) {

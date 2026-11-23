@@ -42,7 +42,7 @@ Un carrusel de ejemplo (portada, publicación con imagen y cierre) en formato 4:
   <tr>
     <td width="50%" valign="top">
       <h3>✍️ El texto se coloca solo</h3>
-      <p>Si el post es largo, la herramienta busca el tamaño de letra que cabe en una slide. También puedes repartirlo en varias slides o fijar el tamaño con “… más”. Los hashtags, menciones y enlaces se colorean como en un post real.</p>
+      <p>Si el post es largo, la herramienta busca el tamaño de letra que cabe en una slide. También puedes repartirlo en varias slides o fijar el tamaño con “… más”. Los hashtags, menciones y enlaces se colorean como en un post real, y una barra de formato pone el texto en <b>negrita</b>, <i>cursiva</i>, subrayado o tachado y crea listas con viñetas o numeradas. Es el formato que funciona en LinkedIn (letras Unicode), así que se copia y se pega tal cual.</p>
     </td>
     <td width="50%" valign="top">
       <h3>🖱️ Todo a un clic derecho</h3>

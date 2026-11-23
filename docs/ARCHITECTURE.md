@@ -154,6 +154,15 @@ barra de secciones. `createPanelHost` pinta `guidePanel` en vez de la sección a
 cualquier navegación explícita a una sección (`panels.select`) sale del modo guiado. Para añadir un paso
 basta una entrada en `steps` con rutas que existan en `DEFAULT_STATE` (hay una prueba que lo comprueba).
 
+### Formato de texto (`core/richText.js`, `fields.richText`)
+
+`richText.js` es puro: separa cada letra de sus acentos (NFD), le pone o quita el estilo (alfabetos Unicode
+sans-serif en negrita, cursiva y negrita cursiva; marcas combinadas U+0332 y U+0336 para subrayado y
+tachado) y vuelve a componer. `formatRange` aplica una operación a la selección de un cuadro de texto (o a
+la palabra bajo el cursor) y devuelve el tramo a sustituir. `fields.richText` pinta la barra y usa
+`execCommand('insertText')` para conservar el «deshacer». `core/graphemes.js` hace que el render cuente
+una letra con su marca como un solo carácter (efecto de escritura y cortes de palabra larga).
+
 ## Móvil (`ui/mobile.js` y piezas asociadas)
 
 Misma interfaz y mismos paneles que el escritorio; en pantallas de hasta 900 px solo cambia la

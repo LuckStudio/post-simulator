@@ -136,3 +136,10 @@ Herramienta web (un único HTML) para **simular cómo se verá una publicación 
   avance «Paso N de M» y «Ir al editor completo». El paso en curso se guarda en la ficha del proyecto: en
   inicio se ve «Paso a paso · N de M» y al abrirlo se continúa donde se dejó. Es el mismo proyecto que en el
   editor completo, así que todo lo editado vale en ambos. Con esto se cierran las seis fases del brief.
+- **v0.12 — formato de texto.** El texto del post (en el editor y en el paso «Texto» del modo guiado)
+  tiene una barra con negrita, cursiva, subrayado, tachado, lista con viñetas, lista numerada, quitar
+  formato y copiar (atajos Ctrl/⌘ + B, I, U). LinkedIn no tiene negrita propia en los posts: lo que se
+  usa son letras Unicode (𝗻𝗲𝗴𝗿𝗶𝘁𝗮, 𝘤𝘶𝘳𝘴𝘪𝘷𝘢) y marcas combinadas, y eso es lo que se aplica aquí, así que el texto
+  se ve igual en la simulación y al pegarlo en LinkedIn. Se conservan acentos y eñes. El estado no
+  cambia: es solo texto. Limitaciones de LinkedIn que se mantienen: no hay cursiva en los números, y
+  los lectores de pantalla leen estas letras de forma poco natural.

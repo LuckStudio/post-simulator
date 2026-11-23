@@ -31,8 +31,8 @@ export function postPanel({ store, f }) {
 
     f.group(
       'Texto del post',
-      'Los hashtags, menciones y enlaces se colorean como en un post real.',
-      f.text('Texto', 'post.text', { area: true, rows: 14 }),
+      'Los hashtags, menciones y enlaces se colorean como en un post real. Selecciona texto para ponerlo en negrita, cursiva, etc.: son letras especiales que funcionan al pegarlas en LinkedIn.',
+      f.richText('Texto', 'post.text', { rows: 14 }),
       f.toggle('Resaltar hashtags, menciones y enlaces', 'post.hashtags'),
     ),
 

@@ -18,7 +18,9 @@ export function guidePanel(deps) {
   let content;
   if (step.fields) {
     content = step.fields.map((fl) =>
-      f.text(fl.label, fl.path, { area: fl.kind === 'area', rows: fl.rows ?? 3, ph: fl.ph ?? '' }),
+      fl.rich
+        ? f.richText(fl.label, fl.path, { rows: fl.rows ?? 8, ph: fl.ph ?? '' })
+        : f.text(fl.label, fl.path, { area: fl.kind === 'area', rows: fl.rows ?? 3, ph: fl.ph ?? '' }),
     );
   } else if (step.panel) {
     content = PANELS[step.panel](deps);
